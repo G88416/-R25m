@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PRNG Tools</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --dark: #0a1128;
+            --light: #f5f5f5;
+            --accent: #4fc3f7;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card h2 {
+            color: var(--secondary);
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background: #eee;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .prng-info {
+            margin-top: 2rem;
+        }
+        
+        .prng-info h3 {
+            color: var(--secondary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Advanced PRNG Tools</h1>
+            <p class="subtitle">Analyze, predict, and reverse-engineer pseudo-random number generators</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>PRNG Analyzer</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="openTab(event, 'generate')">Generate Numbers</button>
+                <button class="tab" onclick="openTab(event, 'predict')">Predict Next Numbers</button>
+                <button class="tab" onclick="openTab(event, 'reverse')">Reverse Engineer Seed</button>
+            </div>
+            
+            <div id="generate" class="tab-content active">
+                <div class="grid">
+                    <div>
+                        <label for="gen-algorithm">PRNG Algorithm:</label>
+                        <select id="gen-algorithm">
+                            <option value="lcg">Linear Congruential Generator (LCG)</option>
+                            <option value="mt">Mersenne Twister</option>
+                            <option value="xorshift">Xorshift</option>
+                            <option value="pcg">PCG (Permuted Congruential Generator)</option>
+                        </select>
+                        
+                        <div id="lcg-params">
+                            <label for="lcg-multiplier">Multiplier (a):</label>
+                            <input type="number" id="lcg-multiplier" value="1664525">
+                            
+                            <label for="lcg-increment">Increment (c):</label>
+                            <input type="number" id="lcg-increment" value="1013904223">
+                            
+                            <label for="lcg-modulus">Modulus (m):</label>
+                            <input type="number" id="lcg-modulus" value="4294967296">
+                        </div>
+                        
+                        <label for="seed">Seed:</label>
+                        <input type="number" id="seed" value="12345">
+                        
+                        <label for="count">Number of values to generate:</label>
+                        <input type="number" id="count" value="10" min="1" max="1000">
+                        
+                        <button onclick="generateNumbers()">Generate</button>
+                    </div>
+                    
+                    <div>
+                        <label>Generated Numbers:</label>
+                        <textarea id="generated-numbers" rows="10" readonly></textarea>
+                        
+                        <div class="result" id="gen-stats">
+                            <strong>Statistics:</strong>
+                            <div id="stats-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="predict" class="tab-content">
+                <div class="grid">
+                    <div>
+                        <label for="predict-algorithm">PRNG Algorithm:</label>
+                        <select id="predict-algorithm">
+                            <option value="lcg">Linear Congruential Generator (LCG)</option>
+                            <option value="mt">Mersenne Twister</option>
+                            <option value="xorshift">Xorshift</option>
+                        </select>
+                        
+                        <label for="observed-numbers">Observed Numbers (one per line):</label>
+                        <textarea id="observed-numbers" rows="5"></textarea>
+                        
+                        <button onclick="predictNumbers()">Predict Next Numbers</button>
+                    </div>
+                    
+                    <div>
+                        <label>Predicted Parameters:</label>
+                        <div class="result" id="predicted-params">
+                            Parameters will appear here after analysis.
+                        </div>
+                        
+                        <label>Next Predicted Numbers:</label>
+                        <textarea id="predicted-numbers" rows="5" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="reverse" class="tab-content">
+                <div class="grid">
+                    <div>
+                        <label for="reverse-algorithm">PRNG Algorithm:</label>
+                        <select id="reverse-algorithm">
+                            <option value="lcg">Linear Congruential Generator (LCG)</option>
+                            <option value="xorshift32">Xorshift32</option>
+                        </select>
+                        
+                        <label for="target-numbers">Observed Numbers (one per line):</label>
+                        <textarea id="target-numbers" rows="5"></textarea>
+                        
+                        <div id="reverse-params" style="display: none;">
+                            <label for="known-multiplier">Known Multiplier (a):</label>
+                            <input type="number" id="known-multiplier">
+                            
+                            <label for="known-increment">Known Increment (c):</label>
+                            <input type="number" id="known-increment">
+                            
+                            <label for="known-modulus">Known Modulus (m):</label>
+                            <input type="number" id="known-modulus">
+                        </div>
+                        
+                        <button onclick="reverseEngineer()">Reverse Engineer Seed</button>
+                    </div>
+                    
+                    <div>
+                        <label>Possible Seeds:</label>
+                        <div class="result" id="seed-results">
+                            Seed candidates will appear here after analysis.
+                        </div>
+                        
+                        <label>Numbers Generated from Found Seeds:</label>
+                        <textarea id="seed-verification" rows="5" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card prng-info">
+            <h2>PRNG Algorithm Information</h2>
+            
+            <div class="grid">
+                <div>
+                    <h3>Linear Congruential Generator (LCG)</h3>
+                    <p>The LCG is one of the oldest and simplest PRNG algorithms defined by the recurrence relation:</p>
+                    <p><strong>X<sub>n+1</sub> = (a × X<sub>n</sub> + c) mod m</strong></p>
+                    <p>Where:</p>
+                    <ul>
+                        <li>X is the sequence of pseudo-random values</li>
+                        <li>a is the multiplier</li>
+                        <li>c is the increment</li>
+                        <li>m is the modulus</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Mersenne Twister</h3>
+                    <p>A widely used PRNG with a period of 2<sup>19937</sup>-1. It provides fast generation of high-quality pseudo-random numbers.</p>
+                    <p>Advantages:</p>
+                    <ul>
+                        <li>Very long period</li>
+                        <li>Good statistical properties</li>
+                        <li>Fast generation</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>Xorshift</h3>
+                    <p>A class of PRNGs using bitwise XOR and shift operations. Very fast but requires careful parameter selection.</p>
+                    <p>Basic Xorshift32 operation:</p>
+                    <pre>x ^= x << 13;
+x ^= x >> 17;
+x ^= x << 5;</pre>
+                </div>
+                
+                <div>
+                    <h3>PCG (Permuted Congruential Generator)</h3>
+                    <p>A family of PRNGs that combines LCG with permutation functions to improve statistical quality.</p>
+                    <p>Features:</p>
+                    <ul>
+                        <li>Excellent statistical properties</li>
+                        <li>Small memory footprint</li>
+                        <li>Predictable output (if needed)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Advanced PRNG Tools &copy; 2023 | For educational and research purposes only</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Algorithm parameter visibility
+        document.getElementById('gen-algorithm').addEventListener('change', function() {
+            const algorithm = this.value;
+            document.getElementById('lcg-params').style.display = algorithm === 'lcg' ? 'block' : 'none';
+        });
+        
+        document.getElementById('reverse-algorithm').addEventListener('change', function() {
+            const algorithm = this.value;
+            document.getElementById('reverse-params').style.display = algorithm === 'lcg' ? 'block' : 'none';
+        });
+        
+        // PRNG implementations
+        class LCG {
+            constructor(seed, a, c, m) {
+                this.seed = seed;
+                this.a = a || 1664525;
+                this.c = c || 1013904223;
+                this.m = m || 4294967296;
+            }
+            
+            next() {
+                this.seed = (this.a * this.seed + this.c) % this.m;
+                return this.seed;
+            }
+        }
+        
+        class Xorshift32 {
+            constructor(seed) {
+                this.seed = seed || 1;
+            }
+            
+            next() {
+                let x = this.seed;
+                x ^= x << 13;
+                x ^= x >> 17;
+                x ^= x << 5;
+                this.seed = x;
+                return x >>> 0; // Ensure unsigned
+            }
+        }
+        
+        // Mersenne Twister implementation (simplified)
+        class MersenneTwister {
+            constructor(seed) {
+                this.N = 624;
+                this.M = 397;
+                this.MATRIX_A = 0x9908b0df;
+                this.UPPER_MASK = 0x80000000;
+                this.LOWER_MASK = 0x7fffffff;
+                
+                this.mt = new Array(this.N);
+                this.mti = this.N + 1;
+                
+                this.init_genrand(seed);
+            }
+            
+            init_genrand(s) {
+                this.mt[0] = s >>> 0;
+                for (this.mti = 1; this.mti < this.N; this.mti++) {
+                    const s = this.mt[this.mti-1] ^ (this.mt[this.mti-1] >>> 30);
+                    this.mt[this.mti] = (((((s & 0xffff0000) >>> 16) * 1812433253) << 16) + (s & 0x0000ffff) * 1812433253 + this.mti;
+                    this.mt[this.mti] >>>= 0;
+                }
+            }
+            
+            genrand_int32() {
+                let y;
+                const mag01 = [0x0, this.MATRIX_A];
+                
+                if (this.mti >= this.N) {
+                    let kk;
+                    
+                    if (this.mti == this.N + 1) {
+                        this.init_genrand(5489);
+                    }
+                    
+                    for (kk = 0; kk < this.N - this.M; kk++) {
+                        y = (this.mt[kk] & this.UPPER_MASK) | (this.mt[kk+1] & this.LOWER_MASK);
+                        this.mt[kk] = this.mt[kk + this.M] ^ (y >>> 1) ^ mag01[y & 0x1];
+                    }
+                    
+                    for (; kk < this.N - 1; kk++) {
+                        y = (this.mt[kk] & this.UPPER_MASK) | (this.mt[kk+1] & this.LOWER_MASK);
+                        this.mt[kk] = this.mt[kk + (this.M - this.N)] ^ (y >>> 1) ^ mag01[y & 0x1];
+                    }
+                    
+                    y = (this.mt[this.N - 1] & this.UPPER_MASK) | (this.mt[0] & this.LOWER_MASK);
+                    this.mt[this.N - 1] = this.mt[this.M - 1] ^ (y >>> 1) ^ mag01[y & 0x1];
+                    
+                    this.mti = 0;
+                }
+                
+                y = this.mt[this.mti++];
+                
+                y ^= (y >>> 11);
+                y ^= (y << 7) & 0x9d2c5680;
+                y ^= (y << 15) & 0xefc60000;
+                y ^= (y >>> 18);
+                
+                return y >>> 0;
+            }
+        }
+        
+        // Generate numbers function
+        function generateNumbers() {
+            const algorithm = document.getElementById('gen-algorithm').value;
+            const seed = parseInt(document.getElementById('seed').value) || 12345;
+            const count = parseInt(document.getElementById('count').value) || 10;
+            
+            let prng;
+            let params = '';
+            
+            switch (algorithm) {
+                case 'lcg':
+                    const a = parseInt(document.getElementById('lcg-multiplier').value) || 1664525;
+                    const c = parseInt(document.getElementById('lcg-increment').value) || 1013904223;
+                    const m = parseInt(document.getElementById('lcg-modulus').value) || 4294967296;
+                    prng = new LCG(seed, a, c, m);
+                    params = `a=${a}, c=${c}, m=${m}`;
+                    break;
+                    
+                case 'xorshift':
+                    prng = new Xorshift
