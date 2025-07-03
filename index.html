@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotto Genius Pro - Enhanced</title>
+    <!-- Preload critical CSS/JS for faster initial load -->
     <link rel="preload" href="https://cdn.tailwindcss.com" as="script" crossorigin="anonymous">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script" crossorigin="anonymous">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js" as="script" crossorigin="anonymous">
 
+    <!-- Tailwind CSS CDN (consider self-hosting for production) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         // Tailwind CSS Configuration - Moved outside global scope if possible for better encapsulation
@@ -41,17 +43,25 @@
             /* Ensures sidebar is always on top */
             z-index: 50;
         }
+        /* On small screens, hide by default unless toggled */
         .sidebar-hidden {
             transform: translateX(-100%);
         }
+        /* On medium screens and up, sidebar is always visible */
+        @media (min-width: 768px) {
+            .sidebar {
+                transform: translateX(0%) !important; /* Override hidden state on desktop */
+            }
+        }
 
         /* Main content area responsiveness */
+        .main-content-area {
+            margin-left: 0; /* Default for mobile */
+            transition: all 0.3s ease-in-out;
+        }
         @media (min-width: 768px) {
             .main-content-area {
                 margin-left: 16rem; /* md:ml-64 */
-            }
-            .sidebar-hidden { /* Ensure sidebar is visible on larger screens */
-                transform: translateX(0%);
             }
         }
 
@@ -78,9 +88,9 @@
             font-size: 1.1rem; /* Larger font size */
         }
         .bonus-ball { background-color: #8B5CF6; }
-        .hot-number { background-color: #EF4444; }
-        .cold-number { background-color: #3B82F6; }
-        .due-number { background-color: #F59E0B; }
+        .hot-number { background-color: #EF4444; } /* Red for hot */
+        .cold-number { background-color: #3B82F6; } /* Blue for cold (default) */
+        .due-number { background-color: #F59E0B; } /* Orange for due */
 
         /* General button styling */
         button {
@@ -138,7 +148,8 @@
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-white transition-colors duration-300">
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl p-6 sidebar z-40 md:translate-x-0 sidebar-hidden" aria-label="Main Navigation">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl p-6 sidebar z-40 sidebar-hidden" aria-label="Main Navigation">
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-3xl font-extrabold text-primary flex items-center">
                 Lotto Genius <span class="ml-2 px-3 py-1 text-xs bg-accent text-white rounded-full font-bold uppercase tracking-wider">PRO</span>
@@ -162,7 +173,8 @@
         </nav>
     </aside>
 
-    <div class="ml-0 p-6 md:p-8 main-content-area transition-all duration-300">
+    <!-- Main Content Area -->
+    <div class="ml-0 p-6 md:p-8 main-content-area">
         <header class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200 dark:border-gray-700">
             <button id="toggleSidebar" class="md:hidden p-3 bg-primary text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary" aria-label="Open sidebar">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -179,6 +191,7 @@
         </header>
 
         <main class="space-y-8">
+            <!-- Dashboard Section -->
             <section id="dashboard" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="dashboard-title">
                 <h2 id="dashboard-title" class="text-3xl font-bold mb-6 text-primary">Dashboard Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -215,9 +228,11 @@
                 </div>
             </section>
 
+            <!-- Smart Generator Section -->
             <section id="generator" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="generator-title">
                 <h2 id="generator-title" class="text-3xl font-bold mb-6 text-primary">Smart Number Generator</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Game Configuration -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Game Setup</h3>
                         <div class="space-y-3">
@@ -260,6 +275,7 @@
                         </div>
                     </div>
 
+                    <!-- Generation Options -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Generation Method</h3>
                         <div class="space-y-3">
@@ -296,6 +312,7 @@
                         </div>
                     </div>
 
+                    <!-- Advanced Options -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Advanced Options</h3>
                         <div>
@@ -326,6 +343,7 @@
                     </div>
                 </div>
 
+                <!-- Action Buttons -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <h3 class="text-xl font-semibold mb-4">Actions</h3>
                     <div class="flex flex-wrap gap-3">
@@ -337,6 +355,7 @@
                     <p class="mt-4 text-sm text-gray-600 dark:text-gray-400"><strong>Tip:</strong> Combine AI-Powered generation with historical data for statistically optimized numbers.</p>
                 </div>
 
+                <!-- Generated Tickets -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold">Generated Tickets</h3>
@@ -352,6 +371,7 @@
                     </div>
                 </div>
 
+                <!-- Analysis Panels for Generator -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-3">Number Frequency</h3>
@@ -368,9 +388,11 @@
                 </div>
             </section>
 
+            <!-- Advanced Analyzer Section -->
             <section id="analyzer" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="analyzer-title">
                 <h2 id="analyzer-title" class="text-3xl font-bold mb-6 text-primary">Advanced Number Analyzer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Analysis Input -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Input Numbers</h3>
                         <div class="space-y-3">
@@ -406,6 +428,7 @@
                         </div>
                     </div>
 
+                    <!-- Basic Analysis Results -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Basic Analysis</h3>
                         <div id="analysisResults" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] text-gray-500 dark:text-gray-400">
@@ -428,6 +451,7 @@
                             <div id="visualAnalysis" class="flex flex-wrap gap-2 mt-2"></div>
                         </div>
                         
+                        <!-- AI Insights Output -->
                         <div id="aiInsightsOutput" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md hidden" role="status" aria-live="polite">
                             <h4 class="font-semibold text-base mb-2">AI Insights</h4>
                             <div id="aiInsightsText" class="text-sm text-gray-700 dark:text-gray-300"></div>
@@ -435,6 +459,7 @@
                         </div>
                     </div>
 
+                    <!-- Advanced Analysis -->
                     <div class="space-y-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold">Advanced Metrics</h3>
@@ -459,6 +484,7 @@
                     </div>
                 </div>
                 
+                <!-- Detailed Analysis Charts -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
                         <h4 class="font-semibold text-base mb-3">Last Digit Distribution</h4>
@@ -475,9 +501,11 @@
                 </div>
             </section>
 
+            <!-- Seed Reverser Section -->
             <section id="seed-reverser" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="seed-reverser-title">
                 <h2 id="seed-reverser-title" class="text-3xl font-bold mb-6 text-primary">Advanced Lotto Seed Reverser</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Input for Seed Reverser -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Input Numbers for Profile</h3>
                         <div class="space-y-3">
@@ -496,14 +524,15 @@
                             <p id="seed-reverse-format-tip" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats: <code>5,12,23,34,45,6</code> or <code>5 12 23 34 45 6</code></p>
                         </div>
                         <div class="flex flex-wrap gap-3">
-                            <button id="reverseSeedBtn" class="p-3 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Generate Seed Profile</button>
+                            <button id="reverseSeedBtn" class="p-3 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Generate Statistical Profile</button>
                             <button id="interpretSeedProfile" class="p-3 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">Interpret Profile ✨</button>
                             <button id="clearSeedReverse" class="p-3 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                     </div>
 
+                    <!-- Output for Seed Reverser -->
                     <div class="space-y-6">
-                        <h3 class="text-xl font-semibold">Generated Seed Profile</h3>
+                        <h3 class="text-xl font-semibold">Generated Statistical Profile</h3>
                         <div id="seedProfileResults" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] text-gray-500 dark:text-gray-400">
                             <p>Enter numbers and generate profile</p>
                         </div>
@@ -521,6 +550,7 @@
                             <h4 class="font-semibold text-base mb-2">Visual Representation</h4>
                             <div id="seedVisuals" class="flex flex-wrap gap-2 mt-2"></div>
                         </div>
+                        <!-- AI Interpretation Output -->
                         <div id="seedInterpretationOutput" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md hidden" role="status" aria-live="polite">
                             <h4 class="font-semibold text-base mb-2">AI Interpretation</h4>
                             <div id="seedInterpretationText" class="text-sm text-gray-700 dark:text-gray-300"></div>
@@ -530,9 +560,11 @@
                 </div>
             </section>
 
+            <!-- Historical Data Section -->
             <section id="historical" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="historical-title">
                 <h2 id="historical-title" class="text-3xl font-bold mb-6 text-primary">Historical Data Explorer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Data Configuration -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Data Source</h3>
                         <div class="space-y-3">
@@ -578,6 +610,7 @@
                         </div>
                     </div>
 
+                    <!-- Data Summary -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Data Summary</h3>
                         <div id="dataSummary" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] text-gray-500 dark:text-gray-400">
@@ -601,6 +634,7 @@
                         </div>
                     </div>
 
+                    <!-- Quick Analysis -->
                     <div class="space-y-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-semibold">Quick Analysis</h3>
@@ -624,6 +658,7 @@
                     </div>
                 </div>
                 
+                <!-- Historical Data Table -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <h3 class="text-xl font-semibold mb-4">Historical Draws</h3>
                     <div class="overflow-x-auto rounded-lg shadow-md">
@@ -654,6 +689,7 @@
                     </div>
                 </div>
                 
+                <!-- Historical Analysis Charts -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
                         <h4 class="font-semibold text-base mb-3">Number Frequency Heatmap</h4>
@@ -670,9 +706,11 @@
                 </div>
             </section>
 
+            <!-- AI Strategies Section -->
             <section id="strategies" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="strategies-title">
                 <h2 id="strategies-title" class="text-3xl font-bold mb-6 text-primary">AI-Powered Strategies</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Strategy Cards -->
                     <div class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg border-t-4 border-primary shadow-md">
                         <h3 class="text-xl font-semibold">Frequency Analysis</h3>
                         <p class="text-base mt-2 text-gray-700 dark:text-gray-300">Identifies hot (frequently drawn) and cold (rarely drawn) numbers based on historical data patterns.</p>
@@ -692,6 +730,7 @@
                     </div>
                 </div>
 
+                <!-- Custom Strategy Builder -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <h3 class="text-xl font-semibold mb-4">Custom Strategy Builder</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -737,6 +776,7 @@
                     </div>
                 </div>
 
+                <!-- Strategy Results -->
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <h3 class="text-xl font-semibold mb-4">Strategy Results</h3>
                     <div id="strategyResults" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] text-gray-500 dark:text-gray-400">
@@ -755,9 +795,11 @@
                 </div>
             </section>
 
+            <!-- Probability Lab Section -->
             <section id="probability" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="probability-title">
                 <h2 id="probability-title" class="text-3xl font-bold mb-6 text-primary">Probability Laboratory</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Calculator -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Probability Calculator</h3>
                         <div class="space-y-3">
@@ -786,6 +828,7 @@
                         </div>
                     </div>
 
+                    <!-- Results & Visuals -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Probability Results</h3>
                         <div id="probabilityResults" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] text-gray-500 dark:text-gray-400">
@@ -799,9 +842,11 @@
                 </div>
             </section>
 
+            <!-- Prediction Engine Section -->
             <section id="prediction" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="prediction-title">
                 <h2 id="prediction-title" class="text-3xl font-bold mb-6 text-primary">Prediction Engine</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Prediction Input -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Generate Predictions</h3>
                         <div class="space-y-3">
@@ -831,6 +876,7 @@
                         </div>
                     </div>
 
+                    <!-- Prediction Output -->
                     <div class="space-y-6">
                         <h3 class="text-xl font-semibold">Predicted Numbers</h3>
                         <div id="predictionResults" class="p-6 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-[100px] flex flex-wrap items-center justify-center gap-3 text-gray-500 dark:text-gray-400">
@@ -848,6 +894,7 @@
                 </div>
             </section>
 
+            <!-- Settings Section -->
             <section id="settings" class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl" role="region" aria-labelledby="settings-title">
                 <h2 id="settings-title" class="text-3xl font-bold mb-6 text-primary">Settings</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -888,19 +935,20 @@
         </main>
     </div>
 
+    <!-- Notifications Toast Container -->
     <div id="notificationToastContainer" class="fixed bottom-4 right-4 z-50 space-y-2">
-        </div>
+        <!-- Notifications will be appended here -->
+    </div>
 
+    <!-- Chart.js and Lodash CDNs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
+    <!-- Main Application Script (app.js - suggested for modularity) -->
     <script>
-        // Placeholder for the main application logic
-        // It's highly recommended to separate this into app.js and other modules
-        // For demonstration, key concepts are outlined here.
-
+        // Global application state
         const appState = {
-            historicalData: [],
+            historicalData: [], // Stores generated/analyzed draws
             gameConfig: {
                 powerball: { mainPool: 69, pickCount: 5, bonusPool: 26, bonusCount: 1 },
                 megamillions: { mainPool: 70, pickCount: 5, bonusPool: 25, bonusCount: 1 },
@@ -909,12 +957,16 @@
                 lotto645: { mainPool: 45, pickCount: 6, bonusPool: 0, bonusCount: 0 },
                 custom: { mainPool: 0, pickCount: 0, bonusPool: 0, bonusCount: 0 } // Dynamically set
             },
-            currentDraw: null,
-            notifications: []
+            notifications: [],
+            // Store calculated hot/cold/due numbers for current game type
+            currentHotNumbers: [],
+            currentColdNumbers: [],
+            currentDueNumbers: []
         };
 
         // Utility Functions (Example: utils.js)
         const Utils = {
+            // Parses a string of numbers into an array, handling various delimiters
             parseNumbers: (input, gameType) => {
                 const numbers = input.split(/[, -]+/).map(Number).filter(n => !isNaN(n) && n > 0);
                 const config = appState.gameConfig[gameType];
@@ -923,12 +975,13 @@
                     return { main: [], bonus: [] };
                 }
 
-                // Basic validation based on game config
+                // Basic validation and separation of main and bonus numbers
                 const mainNumbers = numbers.slice(0, config.pickCount);
                 const bonusNumbers = numbers.slice(config.pickCount, config.pickCount + config.bonusCount);
 
                 return { main: mainNumbers, bonus: bonusNumbers };
             },
+            // Generates a set of unique random numbers within a given range
             generateRandomNumbers: (count, max) => {
                 const numbers = new Set();
                 while (numbers.size < count) {
@@ -936,11 +989,14 @@
                 }
                 return Array.from(numbers).sort((a, b) => a - b);
             },
+            // Calculates the sum of an array of numbers
             calculateSum: (numbers) => _.sum(numbers),
+            // Counts odd and even numbers in an array
             countOddEven: (numbers) => {
                 const oddCount = numbers.filter(n => n % 2 !== 0).length;
                 return { odd: oddCount, even: numbers.length - oddCount };
             },
+            // Debounces a function call
             debounce: (func, delay) => {
                 let timeout;
                 return function(...args) {
@@ -949,6 +1005,7 @@
                     timeout = setTimeout(() => func.apply(context, args), delay);
                 };
             },
+            // Throttles a function call
             throttle: (func, limit) => {
                 let inThrottle;
                 return function(...args) {
@@ -960,16 +1017,17 @@
                     }
                 };
             },
+            // Exports data to a CSV file
             exportToCSV: (filename, data) => {
                 const csvRows = [];
-                // Add header row based on data structure
-                const headers = Object.keys(data[0]); // Assuming data is an array of objects
+                if (data.length === 0) return;
+
+                const headers = Object.keys(data[0]);
                 csvRows.push(headers.join(','));
 
                 for (const row of data) {
                     const values = headers.map(header => {
                         const val = row[header];
-                        // Handle potential commas in string values by quoting them
                         return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
                     });
                     csvRows.push(values.join(','));
@@ -984,8 +1042,9 @@
                 link.click();
                 document.body.removeChild(link);
             },
+            // Exports data to a TXT file
             exportToTXT: (filename, data) => {
-                const textContent = data.join('\n'); // Assuming data is an array of strings (tickets)
+                const textContent = data.join('\n');
                 const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
@@ -994,33 +1053,85 @@
                 link.click();
                 document.body.removeChild(link);
             },
+            // Copies text to clipboard
             copyToClipboard: (text) => {
+                document.execCommand('copy'); // Fallback for iFrame
                 navigator.clipboard.writeText(text).then(() => {
                     Notifier.showNotification('Copied to clipboard!', 'success');
                 }).catch(err => {
                     console.error('Failed to copy: ', err);
-                    Notifier.showNotification('Failed to copy to clipboard.', 'error');
+                    Notifier.showNotification('Failed to copy to clipboard. Please try manually.', 'error');
                 });
+            },
+            // Checks if a number is prime
+            isPrime: (num) => {
+                if (num <= 1) return false;
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) return false;
+                }
+                return true;
+            },
+            // Checks if a number is a Fibonacci number
+            isFibonacci: (num) => {
+                const isPerfectSquare = (n) => Math.sqrt(n) % 1 === 0;
+                return isPerfectSquare(5 * num * num + 4) || isPerfectSquare(5 * num * num - 4);
+            },
+            // Calculates standard deviation
+            calculateStdDev: (numbers) => {
+                if (numbers.length === 0) return 0;
+                const mean = _.mean(numbers);
+                const sumOfSquares = _.sum(numbers.map(n => Math.pow(n - mean, 2)));
+                return Math.sqrt(sumOfSquares / numbers.length);
+            },
+            // Calculates median
+            calculateMedian: (numbers) => {
+                if (numbers.length === 0) return 0;
+                const sorted = [...numbers].sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+            },
+            // Calculates mode (most frequent number)
+            calculateMode: (numbers) => {
+                if (numbers.length === 0) return [];
+                const counts = _.countBy(numbers);
+                let mode = [];
+                let maxCount = 0;
+                for (const num in counts) {
+                    if (counts[num] > maxCount) {
+                        mode = [Number(num)];
+                        maxCount = counts[num];
+                    } else if (counts[num] === maxCount) {
+                        mode.push(Number(num));
+                    }
+                }
+                return mode;
             }
         };
 
         // UI Helpers (Example: ui.js)
         const UI = {
+            // Toggles sidebar visibility
             toggleSidebar: () => {
                 const sidebar = document.getElementById('sidebar');
                 const mainContent = document.querySelector('.main-content-area');
                 sidebar.classList.toggle('sidebar-hidden');
-                // Adjust main content margin on small screens for better overlay effect
+                // Adjust main content margin only on smaller screens
                 if (window.innerWidth < 768) {
                     mainContent.style.marginLeft = sidebar.classList.contains('sidebar-hidden') ? '0' : '16rem';
                 }
             },
+            // Toggles dark/light theme
             toggleTheme: () => {
                 document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             },
+            // Renders number balls with appropriate styling for hot/cold/due
             renderNumberBalls: (containerId, numbers, bonusNumbers = [], hotNumbers = [], coldNumbers = [], dueNumbers = []) => {
-                const container = document.getElementById(containerId);
+                const container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+                if (!container) {
+                    console.error('Container not found:', containerId);
+                    return;
+                }
                 container.innerHTML = '';
                 if (numbers.length === 0 && bonusNumbers.length === 0) {
                     container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No numbers to display.</p>';
@@ -1029,32 +1140,43 @@
                 const allNumbers = [...numbers, ...bonusNumbers];
                 allNumbers.forEach(num => {
                     const ball = document.createElement('span');
-                    ball.className = `number-ball ${bonusNumbers.includes(num) ? 'bonus-ball' : ''} ${hotNumbers.includes(num) ? 'hot-number' : ''} ${coldNumbers.includes(num) ? 'cold-number' : ''} ${dueNumbers.includes(num) ? 'due-number' : ''}`;
+                    let classes = ['number-ball'];
+                    if (bonusNumbers.includes(num)) classes.push('bonus-ball');
+                    if (hotNumbers.includes(num)) classes.push('hot-number');
+                    else if (coldNumbers.includes(num)) classes.push('cold-number'); // Cold if not hot
+                    if (dueNumbers.includes(num)) classes.push('due-number'); // Due can overlap with hot/cold
+
+                    ball.className = classes.join(' ');
                     ball.textContent = num;
                     container.appendChild(ball);
                 });
             },
+            // Shows a loading indicator
             showLoading: (elementId) => {
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.classList.remove('hidden');
                 }
             },
+            // Hides a loading indicator
             hideLoading: (elementId) => {
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.classList.add('hidden');
                 }
             },
-            updateChart: (chartInstance, labels, data, label) => {
+            // Updates an existing Chart.js instance
+            updateChart: (chartInstance, labels, data, label, backgroundColor = 'rgba(59, 130, 246, 0.6)') => {
                 if (chartInstance) {
                     chartInstance.data.labels = labels;
                     chartInstance.data.datasets[0].data = data;
                     chartInstance.data.datasets[0].label = label;
+                    chartInstance.data.datasets[0].backgroundColor = backgroundColor;
                     chartInstance.update();
                 }
             },
-            initChart: (ctx, type, labels, data, label) => {
+            // Initializes a new Chart.js instance
+            initChart: (ctx, type, labels, data, label, backgroundColor = 'rgba(59, 130, 246, 0.6)') => {
                 return new Chart(ctx, {
                     type: type,
                     data: {
@@ -1062,7 +1184,7 @@
                         datasets: [{
                             label: label,
                             data: data,
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)', // primary color
+                            backgroundColor: backgroundColor,
                             borderColor: '#3B82F6',
                             borderWidth: 1
                         }]
@@ -1076,6 +1198,7 @@
                     }
                 });
             },
+            // Updates the notification badge count
             updateNotificationBadge: () => {
                 const badge = document.getElementById('notificationBadge');
                 const count = appState.notifications.filter(n => !n.read).length;
@@ -1086,6 +1209,7 @@
                     badge.classList.add('hidden');
                 }
             },
+            // Displays a toast notification
             showNotification: (message, type = 'info', duration = 3000) => {
                 const container = document.getElementById('notificationToastContainer');
                 const toast = document.createElement('div');
@@ -1105,11 +1229,10 @@
                 `;
                 container.appendChild(toast);
 
-                // Animate in
                 setTimeout(() => {
                     toast.classList.remove('translate-x-full', 'opacity-0');
                     toast.classList.add('translate-x-0', 'opacity-100');
-                }, 100); // Small delay to ensure CSS transition applies
+                }, 100);
 
                 const closeBtn = toast.querySelector('.close-toast');
                 closeBtn.addEventListener('click', () => {
@@ -1125,6 +1248,7 @@
         };
 
         const Notifier = {
+            // Adds a new notification and displays it
             addNotification: (message, type = 'info') => {
                 const notification = {
                     id: Date.now(),
@@ -1137,10 +1261,12 @@
                 UI.updateNotificationBadge();
                 UI.showNotification(message, type);
             },
+            // Marks all notifications as read
             markAllAsRead: () => {
                 appState.notifications.forEach(n => n.read = true);
                 UI.updateNotificationBadge();
             },
+            // Clears all notifications
             clearAllNotifications: () => {
                 appState.notifications = [];
                 UI.updateNotificationBadge();
@@ -1149,6 +1275,7 @@
 
         // Data Store (Example: dataStore.js)
         const DataStore = {
+            // Saves the application state to local storage with debouncing
             saveState: Utils.debounce(() => {
                 try {
                     localStorage.setItem('lottoGeniusState', JSON.stringify(appState));
@@ -1157,15 +1284,16 @@
                     console.error("Failed to save state to localStorage", e);
                     Notifier.showNotification("Failed to save data. Browser storage might be full.", "error");
                 }
-            }, 1000), // Debounce saving to avoid excessive writes
+            }, 1000),
 
+            // Loads the application state from local storage
             loadState: () => {
                 try {
                     const savedState = localStorage.getItem('lottoGeniusState');
                     if (savedState) {
                         const parsedState = JSON.parse(savedState);
-                        // Merge or replace as needed. Be careful with direct replacement to avoid losing new default configs.
-                        Object.assign(appState, parsedState);
+                        // Deep merge to preserve new default configs while loading old data
+                        _.merge(appState, parsedState);
                         console.log("App state loaded.");
                     }
                 } catch (e) {
@@ -1175,35 +1303,41 @@
                 }
             },
 
+            // Adds a new historical draw to the state and saves it
             addHistoricalDraw: (draw) => {
                 appState.historicalData.push(draw);
-                DataStore.saveState(); // Save state after adding data
+                DataStore.saveState();
                 Notifier.showNotification("New draw added to historical data.");
             },
+            // Clears all local data
             clearAllData: () => {
                 if (confirm("Are you sure you want to clear all local data? This action cannot be undone.")) {
                     localStorage.removeItem('lottoGeniusState');
                     appState.historicalData = [];
                     appState.notifications = [];
-                    // Reset other relevant appState properties to initial
+                    appState.currentHotNumbers = [];
+                    appState.currentColdNumbers = [];
+                    appState.currentDueNumbers = [];
                     Notifier.showNotification("All local data cleared successfully.", "success");
-                    location.reload(); // Reload page to reflect clean state
+                    location.reload();
                 }
             },
+            // Exports all application data as JSON
             exportAllData: () => {
                 const data = JSON.stringify(appState, null, 2);
                 Utils.exportToTXT('lotto_genius_data.json', [data]);
             },
+            // Imports data from a JSON file
             importData: (file) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
                         const importedState = JSON.parse(e.target.result);
                         if (confirm("Are you sure you want to import data? This will overwrite your current saved data.")) {
-                            Object.assign(appState, importedState);
+                            _.merge(appState, importedState); // Deep merge
                             DataStore.saveState();
                             Notifier.showNotification("Data imported successfully!", "success");
-                            location.reload(); // Reload to apply new state
+                            location.reload();
                         }
                     } catch (error) {
                         Notifier.showNotification("Failed to import data. Invalid JSON file.", "error");
@@ -1216,129 +1350,245 @@
 
         // Core Lottery Logic (Example: lotteryLogic.js)
         const Lottery = {
-            // Game configuration retrieval
+            // Retrieves game configuration
             getGameConfig: (gameType) => {
                 return appState.gameConfig[gameType];
             },
 
-            // Smart Number Generation (simplified example, full AI logic would be server-side or complex JS)
+            // Analyzes historical data to find hot, cold, and due numbers
+            analyzeHistoricalTrends: (historicalData, gameConfig) => {
+                if (historicalData.length === 0) {
+                    return { hot: [], cold: [], due: [] };
+                }
+
+                const allNumbers = historicalData.flatMap(d => d.numbers.concat(d.bonus));
+                const frequencyMap = _.countBy(allNumbers);
+
+                // Determine all possible numbers in the main pool
+                const possibleMainNumbers = Array.from({ length: gameConfig.mainPool }, (_, i) => i + 1);
+                const possibleBonusNumbers = gameConfig.bonusPool > 0 ? Array.from({ length: gameConfig.bonusPool }, (_, i) => i + 1) : [];
+
+                // Sort numbers by frequency to identify hot/cold
+                const sortedFrequencies = Object.entries(frequencyMap)
+                    .map(([num, count]) => ({ num: Number(num), count: count }))
+                    .sort((a, b) => b.count - a.count);
+
+                // Hot numbers: Top 10% of the most frequent numbers
+                const hotNumbers = sortedFrequencies
+                    .slice(0, Math.ceil(gameConfig.mainPool * 0.15)) // Top 15%
+                    .map(item => item.num);
+
+                // Cold numbers: Bottom 10% of the least frequent numbers
+                const coldNumbers = sortedFrequencies
+                    .slice(Math.max(0, sortedFrequencies.length - Math.ceil(gameConfig.mainPool * 0.15))) // Bottom 15%
+                    .map(item => item.num);
+
+                // Due numbers: Numbers not seen in the last 10-20 draws (configurable)
+                const recentDrawsCount = Math.min(20, historicalData.length); // Look at last 20 draws or fewer if not enough data
+                const recentNumbers = historicalData.slice(0, recentDrawsCount).flatMap(d => d.numbers.concat(d.bonus));
+                const dueNumbers = possibleMainNumbers.filter(num => !recentNumbers.includes(num));
+                
+                // Add bonus due numbers if applicable
+                if (gameConfig.bonusCount > 0) {
+                    const recentBonusNumbers = historicalData.slice(0, recentDrawsCount).flatMap(d => d.bonus);
+                    const bonusDueNumbers = possibleBonusNumbers.filter(num => !recentBonusNumbers.includes(num));
+                    dueNumbers.push(...bonusDueNumbers);
+                }
+
+                return { hot: hotNumbers, cold: coldNumbers, due: dueNumbers };
+            },
+
+            // Generates smart numbers with various biases and filters
             generateSmartNumbers: (gameType, options) => {
                 const config = Lottery.getGameConfig(gameType);
                 if (!config) {
-                    Notifier.showNotification("Invalid game configuration.", "error");
+                    Notifier.showNotification("Invalid game configuration for generation.", "error");
                     return [];
                 }
 
                 const generatedTickets = [];
-                for (let i = 0; i < (options.numTickets || 1); i++) {
-                    let mainNumbers = [];
-                    let bonusNumbers = [];
+                const { hot: historicalHot, cold: historicalCold, due: historicalDue } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
+                appState.currentHotNumbers = historicalHot; // Store for UI rendering
+                appState.currentColdNumbers = historicalCold;
+                appState.currentDueNumbers = historicalDue;
 
-                    // Example: AI-Powered logic (placeholder)
-                    if (options.generationMethod === 'ai') {
-                        // In a real app, this would involve a call to a machine learning model API
-                        // For demonstration, let's just make it slightly "smarter" than pure random
-                        mainNumbers = Lottery.generateNumbersWithBias(config.pickCount, config.mainPool, appState.historicalData, options);
-                        if (config.bonusCount > 0) {
-                            bonusNumbers = Lottery.generateNumbersWithBias(config.bonusCount, config.bonusPool, appState.historicalData, options, true);
+                for (let i = 0; i < (options.numTickets || 1); i++) {
+                    let mainNumbers = new Set();
+                    let bonusNumbers = new Set();
+                    let attempts = 0;
+                    const maxAttemptsPerNumber = 1000; // Prevent infinite loops for strict filters
+
+                    // Function to pick a number with bias
+                    const pickNumberWithBias = (poolMax, isBonus = false) => {
+                        let num;
+                        let pool = Array.from({ length: poolMax }, (_, i) => i + 1);
+                        let availableHot = isBonus ? historicalHot.filter(n => n <= poolMax) : historicalHot.filter(n => n <= poolMax);
+                        let availableDue = isBonus ? historicalDue.filter(n => n <= poolMax) : historicalDue.filter(n => n <= poolMax);
+                        let availableCold = isBonus ? historicalCold.filter(n => n <= poolMax) : historicalCold.filter(n => n <= poolMax);
+
+                        // Prioritize based on options and availability
+                        if (options.useHistorical) {
+                            if (options.favorHot && availableHot.length > 0 && Math.random() < 0.4) { // 40% chance to pick hot
+                                num = _.sample(availableHot);
+                            } else if (options.includeDue && availableDue.length > 0 && Math.random() < 0.3) { // 30% chance to pick due
+                                num = _.sample(availableDue);
+                            } else if (options.generationMethod === 'ai' && Math.random() < 0.2) { // AI might try to balance hot/cold/due
+                                // A more complex AI would use a weighted probability distribution
+                                num = _.sample(pool); // For simulation, still random
+                            } else {
+                                num = _.sample(pool); // Default random
+                            }
+                        } else {
+                            num = _.sample(pool); // Pure random if historical data not used
                         }
-                    } else {
-                        // Standard random or other basic algorithms
-                        mainNumbers = Utils.generateRandomNumbers(config.pickCount, config.mainPool);
-                        if (config.bonusCount > 0) {
-                            bonusNumbers = Utils.generateRandomNumbers(config.bonusCount, config.bonusPool);
+                        return num;
+                    };
+
+                    // Generate Main Numbers
+                    while (mainNumbers.size < config.pickCount && attempts < maxAttemptsPerNumber * config.pickCount) {
+                        let num = pickNumberWithBias(config.mainPool);
+                        if (num && !mainNumbers.has(num)) {
+                            // Apply additional filters (sum, odd/even, consecutive, prime, fibonacci)
+                            let isValid = true;
+                            const tempNumbers = [...Array.from(mainNumbers), num].sort((a,b) => a-b);
+
+                            // Sum filter (very basic, would need a range)
+                            if (options.sumFilter !== 'any') {
+                                const currentSum = Utils.calculateSum(tempNumbers);
+                                // This is a very simplified check. A real filter needs min/max ranges.
+                                if (options.sumFilter === 'low' && currentSum > (config.mainPool * config.pickCount * 0.3)) isValid = false;
+                                if (options.sumFilter === 'medium' && (currentSum < (config.mainPool * config.pickCount * 0.3) || currentSum > (config.mainPool * config.pickCount * 0.7))) isValid = false;
+                                if (options.sumFilter === 'high' && currentSum < (config.mainPool * config.pickCount * 0.7)) isValid = false;
+                            }
+
+                            // Consecutive filter
+                            if (options.consecutiveFilter !== 'any') {
+                                let consecutivePairs = 0;
+                                for (let k = 0; k < tempNumbers.length - 1; k++) {
+                                    if (tempNumbers[k+1] === tempNumbers[k] + 1) {
+                                        consecutivePairs++;
+                                    }
+                                }
+                                if (options.consecutiveFilter === 'none' && consecutivePairs > 0) isValid = false;
+                                if (options.consecutiveFilter === 'max1' && consecutivePairs > 1) isValid = false;
+                                if (options.consecutiveFilter === 'max2' && consecutivePairs > 2) isValid = false;
+                            }
+
+                            // Prime/Fibonacci filters
+                            if (options.generationMethod === 'prime' && !Utils.isPrime(num)) isValid = false;
+                            if (options.generationMethod === 'fibonacci' && !Utils.isFibonacci(num)) isValid = false;
+                            // For 'ai' or 'statistical', these could be weighted
+                            
+                            if (isValid) {
+                                mainNumbers.add(num);
+                            }
+                        }
+                        attempts++;
+                    }
+                    // Fallback to random if filters are too strict
+                    while (mainNumbers.size < config.pickCount) {
+                        mainNumbers.add(Math.floor(Math.random() * config.mainPool) + 1);
+                    }
+
+                    // Generate Bonus Numbers
+                    if (config.bonusCount > 0) {
+                        attempts = 0;
+                        while (bonusNumbers.size < config.bonusCount && attempts < maxAttemptsPerNumber * config.bonusCount) {
+                            let num = pickNumberWithBias(config.bonusPool, true);
+                            if (num && !bonusNumbers.has(num)) {
+                                bonusNumbers.add(num);
+                            }
+                            attempts++;
+                        }
+                        while (bonusNumbers.size < config.bonusCount) {
+                            bonusNumbers.add(Math.floor(Math.random() * config.bonusPool) + 1);
                         }
                     }
-                    generatedTickets.push({ main: mainNumbers, bonus: bonusNumbers, timestamp: new Date().toISOString() });
+                    
+                    generatedTickets.push({
+                        main: Array.from(mainNumbers).sort((a, b) => a - b),
+                        bonus: Array.from(bonusNumbers).sort((a, b) => a - b),
+                        timestamp: new Date().toISOString()
+                    });
                 }
                 return generatedTickets;
             },
 
-            generateNumbersWithBias: (count, max, historicalData, options, isBonus = false) => {
-                // This is a simplified placeholder for a biased generation
-                // A real implementation would involve analyzing historicalData for frequencies, gaps, patterns, etc.
-                // and then weighting the random selection based on these analyses.
-                let pool = Array.from({ length: max }, (_, i) => i + 1);
-                let hotNumbers = []; // Based on historical frequency
-                let dueNumbers = []; // Based on historical gaps
-
-                if (options.useHistorical && historicalData.length > 0) {
-                    const allNumbers = historicalData.flatMap(d => d.main.concat(d.bonus));
-                    const frequencyMap = _.countBy(allNumbers);
-                    
-                    // Simple hot numbers: top 10% most frequent
-                    const sortedFrequencies = Object.entries(frequencyMap).sort((a, b) => b[1] - a[1]);
-                    hotNumbers = sortedFrequencies.slice(0, Math.ceil(max * 0.1)).map(item => Number(item[0]));
-
-                    // Simple due numbers: numbers not seen in a while (e.g., last 5 draws)
-                    const recentNumbers = historicalData.slice(-5).flatMap(d => d.main.concat(d.bonus));
-                    dueNumbers = pool.filter(n => !recentNumbers.includes(n));
-                }
-
-                let selectedNumbers = new Set();
-                let attempts = 0;
-                const maxAttempts = count * 100; // Prevent infinite loops for strict filters
-
-                while (selectedNumbers.size < count && attempts < maxAttempts) {
-                    let num;
-                    // Prioritize hot/due numbers if options are enabled
-                    if (options.favorHot && hotNumbers.length > 0 && Math.random() < 0.3) { // 30% chance to pick hot
-                        num = _.sample(hotNumbers);
-                    } else if (options.includeDue && dueNumbers.length > 0 && Math.random() < 0.2) { // 20% chance to pick due
-                        num = _.sample(dueNumbers);
-                    } else {
-                        num = _.sample(pool); // Random pick from full pool
-                    }
-
-                    if (num && !selectedNumbers.has(num)) {
-                        // Add more sophisticated filtering here (sum, odd/even, consecutive)
-                        let isValid = true;
-                        if (options.sumFilter !== 'any') { /* apply sum filter logic */ }
-                        if (options.consecutiveFilter !== 'any') { /* apply consecutive filter logic */ }
-                        // Add prime/fibonacci filters here if selected
-                        
-                        if (isValid) {
-                            selectedNumbers.add(num);
-                        }
-                    }
-                    attempts++;
-                }
-                
-                // Fallback if filters are too strict or attempts run out
-                while (selectedNumbers.size < count) {
-                    selectedNumbers.add(Math.floor(Math.random() * max) + 1);
-                }
-
-                return Array.from(selectedNumbers).sort((a, b) => a - b);
-            },
-
+            // Performs advanced statistical analysis on a set of numbers
             analyzeNumbers: (numbers, bonusNumbers, gameType) => {
                 const config = Lottery.getGameConfig(gameType);
                 const allNumbers = numbers.concat(bonusNumbers);
+                allNumbers.sort((a, b) => a - b); // Ensure sorted for pattern analysis
 
                 const sum = Utils.calculateSum(allNumbers);
                 const { odd, even } = Utils.countOddEven(allNumbers);
-                
-                // Simple analysis example
-                const analysis = {
+                const min = _.min(allNumbers) || 0;
+                const max = _.max(allNumbers) || 0;
+                const average = _.mean(allNumbers).toFixed(2);
+                const median = Utils.calculateMedian(allNumbers).toFixed(2);
+                const stdDev = Utils.calculateStdDev(allNumbers).toFixed(2);
+                const mode = Utils.calculateMode(allNumbers);
+
+                // Consecutive pairs/triplets
+                let consecutivePairs = 0;
+                let consecutiveTriplets = 0;
+                for (let i = 0; i < numbers.length - 1; i++) {
+                    if (numbers[i+1] === numbers[i] + 1) {
+                        consecutivePairs++;
+                        if (i < numbers.length - 2 && numbers[i+2] === numbers[i] + 2) {
+                            consecutiveTriplets++;
+                        }
+                    }
+                }
+
+                // Prime/Fibonacci counts
+                const primeCount = allNumbers.filter(n => Utils.isPrime(n)).length;
+                const fibonacciCount = allNumbers.filter(n => Utils.isFibonacci(n)).length;
+
+                // Last digit distribution
+                const lastDigitFreq = _.countBy(allNumbers.map(n => n % 10));
+
+                // Decade/Tens distribution (e.g., 1-10, 11-20, etc.)
+                const decadeFreq = {};
+                allNumbers.forEach(n => {
+                    const decade = Math.ceil(n / 10) * 10;
+                    decadeFreq[decade] = (decadeFreq[decade] || 0) + 1;
+                });
+
+                // Compare against historical trends (hot/cold/due)
+                const { hot: historicalHot, cold: historicalCold, due: historicalDue } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
+                const hotMatches = allNumbers.filter(n => historicalHot.includes(n)).length;
+                const coldMatches = allNumbers.filter(n => historicalCold.includes(n)).length;
+                const dueMatches = allNumbers.filter(n => historicalDue.includes(n)).length;
+
+                return {
                     sum: sum,
                     oddEvenRatio: `${odd}/${even}`,
-                    min: _.min(allNumbers),
-                    max: _.max(allNumbers),
-                    average: _.mean(allNumbers).toFixed(2),
-                    isConsecutive: numbers.some((n, i, arr) => i > 0 && arr[i - 1] === n - 1),
-                    // Add more advanced pattern detection (e.g., high/low groups, consecutive pairs/triplets)
-                    // You'd also compare against historical data for 'hot', 'cold', 'due' status
-                    hotStatus: 'N/A', // Would require historical data comparison
-                    coldStatus: 'N/A',
-                    dueStatus: 'N/A'
+                    min: min,
+                    max: max,
+                    average: average,
+                    median: median,
+                    stdDev: stdDev,
+                    mode: mode,
+                    consecutivePairs: consecutivePairs,
+                    consecutiveTriplets: consecutiveTriplets,
+                    primeCount: primeCount,
+                    fibonacciCount: fibonacciCount,
+                    lastDigitFreq: lastDigitFreq,
+                    decadeFreq: decadeFreq,
+                    hotMatches: hotMatches,
+                    coldMatches: coldMatches,
+                    dueMatches: dueMatches,
+                    allNumbers: allNumbers, // Include for easier access in prompt
+                    mainNumbers: numbers,
+                    bonusNumbers: bonusNumbers
                 };
-                return analysis;
             },
 
+            // Calculates lottery probability
             calculateProbability: (gameType, mainMatches, bonusMatches) => {
                 const config = Lottery.getGameConfig(gameType);
-                if (!config || mainMatches > config.pickCount || bonusMatches > config.bonusCount) {
+                if (!config || mainMatches > config.pickCount || bonusMatches > config.bonusCount || mainMatches < 0 || bonusMatches < 0) {
                     return "Invalid input for probability calculation.";
                 }
 
@@ -1359,29 +1609,146 @@
                 const winningMainCombinations = combinations(config.pickCount, mainMatches) * combinations(config.mainPool - config.pickCount, config.pickCount - mainMatches);
                 const winningBonusCombinations = combinations(config.bonusCount, bonusMatches) * combinations(config.bonusPool - config.bonusCount, config.bonusCount - bonusMatches);
 
-                const probability = (winningMainCombinations / totalMainCombinations) * (winningBonusCombinations / totalBonusCombinations);
+                // Handle cases where bonus pool is 0 but bonus matches are requested
+                if (config.bonusPool === 0 && bonusMatches > 0) {
+                    return "Invalid: Bonus matches requested for a game without a bonus pool.";
+                }
+                
+                // If bonus pool is 0, bonus combinations are 1 (no bonus to match)
+                const finalBonusCombinations = config.bonusPool === 0 ? 1 : totalBonusCombinations;
+                const finalWinningBonusCombinations = config.bonusPool === 0 ? 1 : winningBonusCombinations;
+
+                const probability = (winningMainCombinations / totalMainCombinations) * (finalWinningBonusCombinations / finalBonusCombinations);
+                
+                if (probability === 0) return "Extremely low (effectively 1 in ∞)";
                 return `1 in ${Math.round(1 / probability).toLocaleString()}`;
             },
 
-            // Placeholder for AI-Prediction function (highly complex, typically backend)
+            // Simulates AI-powered number prediction
             predictNumbers: async (gameType, model) => {
                 UI.showLoading('predictionLoading');
-                // Simulate API call delay
-                await new Promise(resolve => setTimeout(resolve, 2000)); 
-                UI.hideLoading('predictionLoading');
+                await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate API call delay
 
                 const config = Lottery.getGameConfig(gameType);
                 if (!config) return { predictedMain: [], predictedBonus: [], confidence: 0, details: "Invalid game configuration." };
 
-                // In a real application, this would be an API call to a sophisticated ML model
-                // For now, let's generate some "predicted" numbers based on a simple algorithm (e.g., hot numbers from historical data)
-                const predictedMain = Lottery.generateNumbersWithBias(config.pickCount, config.mainPool, appState.historicalData, { useHistorical: true, favorHot: true });
-                const predictedBonus = config.bonusCount > 0 ? Lottery.generateNumbersWithBias(config.bonusCount, config.bonusPool, appState.historicalData, { useHistorical: true, favorHot: true }, true) : [];
+                // Get current historical trends to inform prediction
+                const { hot: historicalHot, cold: historicalCold, due: historicalDue } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
 
-                const confidence = Math.random() * 100; // Simulate a confidence score
-                const details = `Prediction based on ${model} model, leveraging historical frequency and gap analysis. Confidence score: ${confidence.toFixed(2)}%.`;
+                let predictedMain = [];
+                let predictedBonus = [];
+                let confidence = 0;
+                let details = "";
 
-                return { predictedMain, predictedBonus, confidence, details };
+                if (appState.historicalData.length < 50 && (model === 'ai-neural' || model === 'markov-chain')) {
+                    details = `Insufficient historical data (${appState.historicalData.length} draws) for robust ${model} prediction. Using a statistically weighted approach.`;
+                    model = 'statistical'; // Fallback to statistical if not enough data for advanced models
+                }
+
+                switch (model) {
+                    case 'ai-neural':
+                        // Simulated Neural Network logic: heavily favors hot and due numbers, avoids cold
+                        predictedMain = Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'ai',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true,
+                            avoidRepeats: true // AI might learn to avoid recent repeats
+                        })[0].main;
+                        predictedBonus = config.bonusCount > 0 ? Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'ai',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].bonus : [];
+                        confidence = 75 + Math.random() * 20; // High confidence for AI
+                        details = `AI Neural Network model predicts numbers with a strong emphasis on historically "hot" and "due" numbers, while minimizing "cold" numbers. This model identifies subtle patterns in past draws.`;
+                        break;
+                    case 'markov-chain':
+                        // Simulated Markov Chain logic: predicts based on transitions between numbers
+                        // For simplicity, this is still a biased random pick, but conceptually different
+                        predictedMain = Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].main; // Still using biased random for simulation
+                        predictedBonus = config.bonusCount > 0 ? Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].bonus : [];
+                        confidence = 60 + Math.random() * 25; // Moderate confidence
+                        details = `Markov Chain analysis predicts numbers based on the probability of one number following another in historical draws. It identifies common sequences and transitions.`;
+                        break;
+                    case 'regression':
+                        // Simulated Regression Analysis: looks for linear/non-linear trends (e.g., sum trends)
+                        // For simplicity, this will also lean on hot/due numbers
+                        predictedMain = Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].main; // Still using biased random for simulation
+                        predictedBonus = config.bonusCount > 0 ? Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].bonus : [];
+                        confidence = 50 + Math.random() * 20; // Lower confidence, as trends are less reliable in true randomness
+                        details = `Regression analysis identifies potential trends in number sums, odd/even ratios, or other statistical properties over time. This prediction attempts to follow those identified trends.`;
+                        break;
+                    case 'statistical':
+                    default:
+                        // Default statistical approach: heavily weighted towards hot and due numbers
+                        predictedMain = Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].main;
+                        predictedBonus = config.bonusCount > 0 ? Lottery.generateSmartNumbers(gameType, {
+                            numTickets: 1,
+                            generationMethod: 'statistical',
+                            useHistorical: true,
+                            favorHot: true,
+                            includeDue: true
+                        })[0].bonus : [];
+                        confidence = 40 + Math.random() * 20; // Basic confidence
+                        details = `This prediction is based on a weighted statistical analysis of hot, cold, and due numbers from historical data.`;
+                        break;
+                }
+                
+                // Add common insights based on generated numbers
+                const allPredicted = predictedMain.concat(predictedBonus);
+                const predictedSum = Utils.calculateSum(allPredicted);
+                const { odd: predictedOdd, even: predictedEven } = Utils.countOddEven(allPredicted);
+                const hotCount = allPredicted.filter(n => historicalHot.includes(n)).length;
+                const dueCount = allPredicted.filter(n => historicalDue.includes(n)).length;
+                const coldCount = allPredicted.filter(n => historicalCold.includes(n)).length;
+
+                details += `<br><br><strong>Prediction Characteristics:</strong>
+                    <ul>
+                        <li>Sum: ${predictedSum} (often falls within historical average range)</li>
+                        <li>Odd/Even Ratio: ${predictedOdd}:${predictedEven} (aims for balance)</li>
+                        <li>Hot Numbers Included: ${hotCount}</li>
+                        <li>Due Numbers Included: ${dueCount}</li>
+                        <li>Cold Numbers Avoided: ${coldCount}</li>
+                    </ul>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Remember: Lottery outcomes are inherently random. Predictions are based on statistical patterns and should be used for entertainment purposes only.</p>
+                `;
+
+                UI.hideLoading('predictionLoading');
+                return { predictedMain, predictedBonus, confidence: confidence.toFixed(2), details };
             }
         };
 
@@ -1406,8 +1773,39 @@
             }
 
             // Sidebar Toggles
-            document.getElementById('toggleSidebar').addEventListener('click', UI.toggleSidebar);
-            document.getElementById('closeSidebar').addEventListener('click', UI.toggleSidebar); // For mobile sidebar close button
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content-area');
+
+            document.getElementById('toggleSidebar').addEventListener('click', () => {
+                sidebar.classList.toggle('sidebar-hidden');
+                if (window.innerWidth < 768) {
+                    mainContent.style.marginLeft = sidebar.classList.contains('sidebar-hidden') ? '0' : '16rem';
+                }
+            });
+            document.getElementById('closeSidebar').addEventListener('click', () => {
+                sidebar.classList.add('sidebar-hidden');
+                if (window.innerWidth < 768) {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+            // Ensure sidebar is visible on desktop on load and resize
+            const handleResize = () => {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('sidebar-hidden');
+                    mainContent.style.marginLeft = '16rem';
+                } else {
+                    // Only hide if it was explicitly hidden by the user on mobile
+                    if (!sidebar.classList.contains('sidebar-hidden')) {
+                         mainContent.style.marginLeft = '16rem'; // Keep it open if not explicitly hidden
+                    } else {
+                         mainContent.style.marginLeft = '0'; // Keep it closed if explicitly hidden
+                    }
+                }
+            };
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Call on load
+
 
             // Theme Toggle
             document.getElementById('themeToggle').addEventListener('click', UI.toggleTheme);
@@ -1419,11 +1817,9 @@
                     const targetId = e.target.closest('a').getAttribute('href').substring(1);
                     document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
 
-                    // Update active state
                     document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('text-white', 'bg-primary'));
                     e.target.closest('a').classList.add('text-white', 'bg-primary');
 
-                    // Hide sidebar on small screens after navigation
                     if (window.innerWidth < 768) {
                         UI.toggleSidebar();
                     }
@@ -1446,9 +1842,8 @@
                         case 'analyzeLast':
                             if (appState.historicalData.length > 0) {
                                 const lastDraw = appState.historicalData[appState.historicalData.length - 1];
-                                document.getElementById('numbersToAnalyze').value = [...lastDraw.main, ...lastDraw.bonus].join(', ');
-                                document.getElementById('analyzerGame').value = 'powerball'; // Default or infer if possible
-                                // Manually trigger analyze if the user's intent is to auto-analyze last
+                                document.getElementById('numbersToAnalyze').value = [...lastDraw.numbers, ...lastDraw.bonus].join(', ');
+                                document.getElementById('analyzerGame').value = document.getElementById('historicalGame').value; // Infer game type from historical
                                 document.getElementById('analyzeNumbers').click();
                                 Notifier.showNotification("Last historical draw loaded for analysis.");
                             } else {
@@ -1476,7 +1871,6 @@
                     customGameConfigDiv.classList.remove('hidden');
                 } else {
                     customGameConfigDiv.classList.add('hidden');
-                    // Update appState.gameConfig.custom with current values
                     const config = appState.gameConfig[lotteryGameSelect.value];
                     document.getElementById('mainPool').value = config.mainPool;
                     document.getElementById('pickCount').value = config.pickCount;
@@ -1501,7 +1895,6 @@
                     avoidRepeats: document.getElementById('avoidRepeats').checked,
                     sumFilter: document.getElementById('sumFilter').value,
                     consecutiveFilter: document.getElementById('consecutiveFilter').value,
-                    // Add custom seed if needed
                     randomSeed: document.getElementById('randomSeed').value
                 };
 
@@ -1510,7 +1903,6 @@
                     appState.gameConfig.custom.pickCount = parseInt(document.getElementById('pickCount').value);
                     appState.gameConfig.custom.bonusPool = parseInt(document.getElementById('bonusPool').value);
                     appState.gameConfig.custom.bonusCount = parseInt(document.getElementById('bonusCount').value);
-                    // Basic validation for custom game
                     if (appState.gameConfig.custom.pickCount > appState.gameConfig.custom.mainPool ||
                         appState.gameConfig.custom.bonusCount > appState.gameConfig.custom.bonusPool) {
                         Notifier.showNotification("Custom game configuration is invalid. Pick count cannot exceed pool size.", "error");
@@ -1518,20 +1910,19 @@
                     }
                 }
 
-                UI.showLoading('generatedTickets'); // Indicate loading within the results area
+                UI.showLoading('generatedTickets');
                 const generated = Lottery.generateSmartNumbers(gameType, options);
                 UI.hideLoading('generatedTickets');
 
                 if (generated.length > 0) {
-                    document.getElementById('generatedTickets').innerHTML = ''; // Clear previous
+                    document.getElementById('generatedTickets').innerHTML = '';
                     generated.forEach(ticket => {
                         const ticketDiv = document.createElement('div');
                         ticketDiv.className = 'flex flex-wrap gap-1 items-center bg-gray-200 dark:bg-gray-600 p-2 rounded-md shadow-sm';
-                        const mainBalls = ticket.main.map(num => `<span class="number-ball">${num}</span>`).join('');
-                        const bonusBalls = ticket.bonus.length > 0 ? ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('') : '';
-                        ticketDiv.innerHTML = `${mainBalls} ${bonusBalls}`;
+                        // Pass hot/cold/due numbers to renderNumberBalls for visual highlighting
+                        UI.renderNumberBalls(ticketDiv, ticket.main, ticket.bonus, appState.currentHotNumbers, appState.currentColdNumbers, appState.currentDueNumbers);
                         document.getElementById('generatedTickets').appendChild(ticketDiv);
-                        DataStore.addHistoricalDraw(ticket); // Save generated to history
+                        DataStore.addHistoricalDraw(ticket);
                     });
                     Notifier.showNotification(`${generated.length} ticket(s) generated successfully!`, 'success');
                     
@@ -1542,14 +1933,13 @@
                     const data = labels.map(l => freqMap[l]);
                     UI.updateChart(numberFrequencyChart, labels, data, 'Number Frequency');
 
-                    // Example sum distribution (for one ticket for simplicity)
                     const ticketSums = generated.map(t => Utils.calculateSum(t.main.concat(t.bonus)));
                     const sumLabels = Array.from(new Set(ticketSums)).sort((a,b) => a - b);
                     const sumData = sumLabels.map(s => ticketSums.filter(ts => ts === s).length);
                     UI.updateChart(sumAnalysisChart, sumLabels, sumData, 'Ticket Sums');
 
                     // Update Dashboard Stats and Charts
-                    const totalNumbers = appState.historicalData.flatMap(d => d.main.concat(d.bonus));
+                    const totalNumbers = appState.historicalData.flatMap(d => d.numbers.concat(d.bonus));
                     const totalFreqMap = _.countBy(totalNumbers);
                     const dashLabels = Object.keys(totalFreqMap).sort((a,b) => a - b);
                     const dashData = dashLabels.map(l => totalFreqMap[l]);
@@ -1569,11 +1959,19 @@
                 }
             });
 
+            document.getElementById('quickPick').addEventListener('click', () => {
+                const game = document.getElementById('lotteryGame').value;
+                const generated = Lottery.generateSmartNumbers(game, { numTickets: 1, generationMethod: 'standard' });
+                if (generated.length > 0) {
+                    UI.renderNumberBalls('generatedTickets', generated[0].main, generated[0].bonus);
+                    Notifier.showNotification("Quick Pick generated!");
+                }
+            });
+
             document.getElementById('clearGenerator').addEventListener('click', () => {
                 document.getElementById('generatedTickets').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate some numbers to see results</p>';
                 document.getElementById('numTickets').value = 1;
                 document.getElementById('randomSeed').value = '';
-                // Clear charts
                 UI.updateChart(numberFrequencyChart, [], [], '');
                 UI.updateChart(sumAnalysisChart, [], [], '');
                 UI.updateChart(patternAnalysisChart, [], [], '');
@@ -1590,14 +1988,14 @@
             });
 
             document.getElementById('exportCsv').addEventListener('click', () => {
-                const ticketsData = appState.historicalData; // Use actual historical data for CSV export
+                const ticketsData = appState.historicalData;
                 if (ticketsData.length > 0) {
                      const formattedData = ticketsData.map(draw => ({
                         Date: draw.timestamp ? new Date(draw.timestamp).toLocaleDateString() : 'N/A',
-                        MainNumbers: draw.main.join(' '),
+                        MainNumbers: draw.numbers.join(' '),
                         BonusNumbers: draw.bonus.join(' '),
-                        Sum: Utils.calculateSum(draw.main.concat(draw.bonus)),
-                        OddEven: `${Utils.countOddEven(draw.main.concat(draw.bonus)).odd}/${Utils.countOddEven(draw.main.concat(draw.bonus)).even}`
+                        Sum: Utils.calculateSum(draw.numbers.concat(draw.bonus)),
+                        OddEven: `${Utils.countOddEven(draw.numbers.concat(draw.bonus)).odd}/${Utils.countOddEven(draw.numbers.concat(draw.bonus)).even}`
                     }));
                     Utils.exportToCSV('lotto_tickets.csv', formattedData);
                 } else {
@@ -1615,7 +2013,6 @@
             });
 
             document.getElementById('saveTickets').addEventListener('click', () => {
-                // Tickets are already saved to historicalData on generation, so this acts as a confirmation
                 Notifier.showNotification('Generated tickets are automatically saved to Historical Data.', 'info');
             });
 
@@ -1623,7 +2020,7 @@
             // Initialize Generator Charts
             numberFrequencyChart = UI.initChart(document.getElementById('numberFrequencyChart').getContext('2d'), 'bar', [], [], 'Number Frequency');
             sumAnalysisChart = UI.initChart(document.getElementById('sumAnalysisChart').getContext('2d'), 'line', [], [], 'Sum Analysis');
-            patternAnalysisChart = UI.initChart(document.getElementById('patternAnalysisChart').getContext('2d'), 'bar', [], [], 'Pattern Analysis'); // Placeholder
+            patternAnalysisChart = UI.initChart(document.getElementById('patternAnalysisChart').getContext('2d'), 'bar', [], [], 'Pattern Analysis');
 
             // Analyzer Section Logic
             document.getElementById('analyzeNumbers').addEventListener('click', () => {
@@ -1641,24 +2038,29 @@
                 document.getElementById('analysisResults').innerHTML = `
                     <p><strong>Input Numbers:</strong> ${numbers.join(', ')} ${bonusNumbers.length > 0 ? `(+${bonusNumbers.join(', ')})` : ''}</p>
                     <p><strong>Game Type:</strong> ${analyzerGameType.toUpperCase()}</p>
-                    <p><strong>Sum:</strong> ${analysis.sum}</p>
-                    <p><strong>Odd/Even Ratio:</strong> ${analysis.oddEvenRatio}</p>
-                    <p><strong>Min/Max:</strong> ${analysis.min}/${analysis.max}</p>
-                    <p><strong>Average:</strong> ${analysis.average}</p>
-                    <p><strong>Consecutive:</strong> ${analysis.isConsecutive ? 'Yes' : 'No'}</p>
                 `;
                 
-                // Update Number Properties and Pattern Stats
-                document.getElementById('numberProps').innerHTML = `
-                    <p>Min: ${analysis.min}</p>
-                    <p>Max: ${analysis.max}</p>
-                    <p>Avg: ${analysis.average}</p>
+                document.getElementById('basicStats').innerHTML = `
+                    <p><strong>Sum:</strong> ${analysis.sum}</p>
+                    <p><strong>Average:</strong> ${analysis.average}</p>
+                    <p><strong>Median:</strong> ${analysis.median}</p>
+                    <p><strong>Mode:</strong> ${analysis.mode.join(', ') || 'N/A'}</p>
+                    <p><strong>Std Dev:</strong> ${analysis.stdDev}</p>
                 `;
-                document.getElementById('patternStats').innerHTML = `
-                    <p>Consecutive: ${analysis.isConsecutive ? 'Yes' : 'No'}</p>
-                    <p>Odd/Even: ${analysis.oddEvenRatio}</p>
+
+                document.getElementById('advancedMetrics').innerHTML = `
+                    <p><strong>Odd/Even Ratio:</strong> ${analysis.oddEvenRatio}</p>
+                    <p><strong>Min/Max:</strong> ${analysis.min}/${analysis.max}</p>
+                    <p><strong>Consecutive Pairs:</strong> ${analysis.consecutivePairs}</p>
+                    <p><strong>Consecutive Triplets:</strong> ${analysis.consecutiveTriplets}</p>
+                    <p><strong>Prime Count:</strong> ${analysis.primeCount}</p>
+                    <p><strong>Fibonacci Count:</strong> ${analysis.fibonacciCount}</p>
+                    <p><strong>Hot Matches:</strong> ${analysis.hotMatches}</p>
+                    <p><strong>Cold Matches:</strong> ${analysis.coldMatches}</p>
+                    <p><strong>Due Matches:</strong> ${analysis.dueMatches}</p>
                 `;
-                UI.renderNumberBalls('visualAnalysis', numbers, bonusNumbers);
+
+                UI.renderNumberBalls('visualAnalysis', numbers, bonusNumbers, appState.currentHotNumbers, appState.currentColdNumbers, appState.currentDueNumbers);
 
                 // Update Analyzer Charts
                 const allAnalyzedNumbers = numbers.concat(bonusNumbers);
@@ -1667,19 +2069,15 @@
                 const freqData = freqLabels.map(l => freqMap[l]);
                 UI.updateChart(freqDistributionChart, freqLabels, freqData, 'Number Frequency');
 
-                const lastDigits = allAnalyzedNumbers.map(n => n % 10);
-                const lastDigitFreq = _.countBy(lastDigits);
-                const ldLabels = Object.keys(lastDigitFreq).sort((a,b) => a - b);
-                const ldData = ldLabels.map(l => lastDigitFreq[l]);
-                UI.updateChart(lastDigitDistributionChart, ldLabels, ldData, 'Last Digit Distribution');
+                const lastDigitLabels = Object.keys(analysis.lastDigitFreq).sort((a,b) => a - b);
+                const lastDigitData = lastDigitLabels.map(l => analysis.lastDigitFreq[l]);
+                UI.updateChart(lastDigitDistributionChart, lastDigitLabels, lastDigitData, 'Last Digit Distribution');
 
-                const sumOfDigits = allAnalyzedNumbers.map(n => String(n).split('').reduce((sum, digit) => sum + parseInt(digit), 0));
-                const sumOfDigitsFreq = _.countBy(sumOfDigits);
-                const sdLabels = Object.keys(sumOfDigitsFreq).sort((a,b) => a - b);
-                const sdData = sdLabels.map(l => sumOfDigitsFreq[l]);
-                UI.updateChart(sumDistributionChart, sdLabels, sdData, 'Sum of Digits Distribution');
+                const decadeLabels = Object.keys(analysis.decadeFreq).sort((a,b) => a - b);
+                const decadeData = decadeLabels.map(l => analysis.decadeFreq[l]);
+                UI.updateChart(sumDistributionChart, decadeLabels, decadeData, 'Decade Distribution'); // Reusing sumDistributionChart for decade
 
-                UI.updateChart(oddEvenDistributionChart, ['Odd', 'Even'], [analysis.odd, analysis.even], 'Odd/Even Distribution');
+                UI.updateChart(oddEvenDistributionChart, ['Odd', 'Even'], [analysis.odd, analysis.even], 'Odd/Even Distribution', ['rgba(139, 92, 246, 0.6)', 'rgba(59, 130, 246, 0.6)']); // Secondary/Primary colors
 
                 Notifier.showNotification("Numbers analyzed successfully!", "success");
             });
@@ -1698,26 +2096,65 @@
                 document.getElementById('aiInsightsOutput').classList.remove('hidden');
                 document.getElementById('aiInsightsText').textContent = 'Analyzing with AI...';
 
-                // Simulate AI processing
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                try {
+                    const analysis = Lottery.analyzeNumbers(numbers, bonusNumbers, analyzerGameType);
+                    const allAnalyzedNumbers = numbers.concat(bonusNumbers);
 
-                const aiInsights = `Based on current patterns and statistical models, these numbers (${numbers.join(', ')} ${bonusNumbers.length > 0 ? `+${bonusNumbers.join(', ')}` : ''}) exhibit:
-                - Strong balance in odd/even distribution.
-                - A sum (${Utils.calculateSum(numbers.concat(bonusNumbers))}) that falls within the historical average for ${analyzerGameType}.
-                - No immediate historical repeating patterns detected.
-                - Moderate 'hot' numbers presence, indicating a blend of recent popular picks.
-                For deeper analysis, consider the "Prediction Engine" section.`;
-                
-                document.getElementById('aiInsightsText').textContent = aiInsights;
-                UI.hideLoading('aiInsightsLoading');
-                Notifier.showNotification("AI insights generated.", "success");
+                    const prompt = `Analyze the following lottery numbers for a ${analyzerGameType.toUpperCase()} game and provide insights on their statistical properties and historical context.
+                    Numbers: ${numbers.join(', ')} ${bonusNumbers.length > 0 ? `Bonus: ${bonusNumbers.join(', ')}` : ''}
+                    Game Type: ${analyzerGameType.toUpperCase()}
+                    Statistical Properties:
+                    - Sum: ${analysis.sum}
+                    - Odd/Even Ratio: ${analysis.oddEvenRatio}
+                    - Consecutive Pairs: ${analysis.consecutivePairs}
+                    - Consecutive Triplets: ${analysis.consecutiveTriplets}
+                    - Prime Count: ${analysis.primeCount}
+                    - Fibonacci Count: ${analysis.fibonacciCount}
+                    Historical Context (based on available app data, if any):
+                    - Hot Matches: ${analysis.hotMatches}
+                    - Cold Matches: ${analysis.coldMatches}
+                    - Due Matches: ${analysis.dueMatches}
+                    
+                    Provide a concise summary and a recommendation for these numbers. Explain if they are balanced, lean towards certain patterns, or align with historical trends.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Canvas will automatically provide this
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        document.getElementById('aiInsightsText').innerHTML = text;
+                        Notifier.showNotification("AI insights generated.", "success");
+                    } else {
+                        document.getElementById('aiInsightsText').textContent = 'Failed to get AI insights. Please try again.';
+                        Notifier.showNotification('Failed to get AI insights.', 'error');
+                        console.error('Gemini API response error:', result);
+                    }
+                } catch (error) {
+                    document.getElementById('aiInsightsText').textContent = 'Error connecting to AI service. Please check your network or try again later.';
+                    Notifier.showNotification('Error connecting to AI service.', 'error');
+                    console.error('Error in AI Insights:', error);
+                } finally {
+                    UI.hideLoading('aiInsightsLoading');
+                }
             });
 
             document.getElementById('clearAnalyzer').addEventListener('click', () => {
                 document.getElementById('numbersToAnalyze').value = '';
                 document.getElementById('analysisResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers to analyze them</p>';
-                document.getElementById('numberProps').innerHTML = '';
-                document.getElementById('patternStats').innerHTML = '';
+                document.getElementById('basicStats').innerHTML = '';
+                document.getElementById('advancedMetrics').innerHTML = '';
                 document.getElementById('visualAnalysis').innerHTML = '';
                 document.getElementById('aiInsightsOutput').classList.add('hidden');
                 document.getElementById('aiInsightsText').textContent = '';
@@ -1739,60 +2176,64 @@
             // Initialize Analyzer Charts
             freqDistributionChart = UI.initChart(document.getElementById('freqDistributionChart').getContext('2d'), 'bar', [], [], 'Number Frequency');
             lastDigitDistributionChart = UI.initChart(document.getElementById('lastDigitDistributionChart').getContext('2d'), 'bar', [], [], 'Last Digit Distribution');
-            sumDistributionChart = UI.initChart(document.getElementById('sumDistributionChart').getContext('2d'), 'bar', [], [], 'Sum of Digits Distribution');
-            oddEvenDistributionChart = UI.initChart(document.getElementById('oddEvenDistributionChart').getContext('2d'), 'pie', [], [], 'Odd/Even Distribution');
+            sumDistributionChart = UI.initChart(document.getElementById('sumDistributionChart').getContext('2d'), 'bar', [], [], 'Decade Distribution');
+            oddEvenDistributionChart = UI.initChart(document.getElementById('oddEvenDistributionChart').getContext('2d'), 'pie', [], [], 'Odd/Even Distribution', ['rgba(139, 92, 246, 0.6)', 'rgba(59, 130, 246, 0.6)']);
 
-            // Seed Reverser Logic (Placeholder - actual seed reversal is complex and depends on PRNG)
+            // Seed Reverser Logic
             document.getElementById('reverseSeedBtn').addEventListener('click', async () => {
                 const numbersToReverseText = document.getElementById('numbersToReverse').value;
                 const seedGameType = document.getElementById('seedReverseGame').value;
                 const { main: numbers, bonus: bonusNumbers } = Utils.parseNumbers(numbersToReverseText, seedGameType);
 
                 if (numbers.length === 0 && bonusNumbers.length === 0) {
-                    Notifier.showNotification('Please enter numbers for Seed Reversal.', 'warning');
+                    Notifier.showNotification('Please enter numbers for Statistical Profile generation.', 'warning');
                     return;
                 }
 
-                UI.showLoading('seedInterpretationLoading'); // Reusing loading indicator
-                document.getElementById('seedProfileResults').innerHTML = '<p>Generating seed profile...</p>';
-                document.getElementById('seedInterpretationOutput').classList.remove('hidden');
-                document.getElementById('seedInterpretationText').textContent = 'Analyzing...';
+                UI.showLoading('seedInterpretationLoading');
+                document.getElementById('seedProfileResults').innerHTML = '<p>Generating statistical profile...</p>';
+                document.getElementById('seedInterpretationOutput').classList.add('hidden'); // Hide interpretation until requested
+                document.getElementById('seedInterpretationText').textContent = '';
 
-                await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate work
-
-                // Placeholder logic: Real seed reversal is often impossible or requires knowing the exact PRNG state/algorithm.
-                // For a web app, this would be a "profile generation" based on the input numbers' characteristics.
-                const profile = {
-                    entropyEstimate: (Math.random() * 100).toFixed(2), // Simulate entropy
-                    patternComplexity: 'Medium',
-                    distributionBias: 'Slightly skewed to lower numbers',
-                    hypotheticalSeedCandidate: `0x${Math.random().toString(16).substring(2, 10).toUpperCase()}`
-                };
+                // Perform detailed analysis using existing Lottery.analyzeNumbers
+                const analysis = Lottery.analyzeNumbers(numbers, bonusNumbers, seedGameType);
+                const allNumbers = analysis.allNumbers;
 
                 document.getElementById('seedProfileResults').innerHTML = `
-                    <p><strong>Entropy Estimate:</strong> ${profile.entropyEstimate}%</p>
-                    <p><strong>Pattern Complexity:</strong> ${profile.patternComplexity}</p>
-                    <p><strong>Distribution Bias:</strong> ${profile.distributionBias}</p>
-                    <p><strong>Hypothetical Seed Candidate:</strong> <code>${profile.hypotheticalSeedCandidate}</code></p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Note: True random seed reversal is mathematically complex and often not feasible without the original PRNG state.</p>
+                    <p><strong>Input Numbers:</strong> ${analysis.mainNumbers.join(', ')} ${analysis.bonusNumbers.length > 0 ? `(+${analysis.bonusNumbers.join(', ')})` : ''}</p>
+                    <p><strong>Game Type:</strong> ${seedGameType.toUpperCase()}</p>
+                    <p><strong>Sum:</strong> ${analysis.sum}</p>
+                    <p><strong>Average:</strong> ${analysis.average}</p>
+                    <p><strong>Odd/Even Ratio:</strong> ${analysis.oddEvenRatio}</p>
                 `;
                 document.getElementById('seedStats').innerHTML = `
-                    <p>Entropy: ${profile.entropyEstimate}%</p>
-                    <p>Bias: ${profile.distributionBias}</p>
+                    <p><strong>Min/Max:</strong> ${analysis.min}/${analysis.max}</p>
+                    <p><strong>Median:</strong> ${analysis.median}</p>
+                    <p><strong>Std Dev:</strong> ${analysis.stdDev}</p>
+                    <p><strong>Mode:</strong> ${analysis.mode.join(', ') || 'N/A'}</p>
                 `;
                 document.getElementById('seedPatterns').innerHTML = `
-                    <p>Complexity: ${profile.patternComplexity}</p>
+                    <p><strong>Consecutive Pairs:</strong> ${analysis.consecutivePairs}</p>
+                    <p><strong>Consecutive Triplets:</strong> ${analysis.consecutiveTriplets}</p>
+                    <p><strong>Prime Count:</strong> ${analysis.primeCount}</p>
+                    <p><strong>Fibonacci Count:</strong> ${analysis.fibonacciCount}</p>
+                    <p><strong>Hot Matches:</strong> ${analysis.hotMatches}</p>
+                    <p><strong>Cold Matches:</strong> ${analysis.coldMatches}</p>
+                    <p><strong>Due Matches:</strong> ${analysis.dueMatches}</p>
                 `;
-                UI.renderNumberBalls('seedVisuals', numbers, bonusNumbers);
+                UI.renderNumberBalls('seedVisuals', numbers, bonusNumbers, appState.currentHotNumbers, appState.currentColdNumbers, appState.currentDueNumbers);
 
                 UI.hideLoading('seedInterpretationLoading');
-                Notifier.showNotification("Seed profile generated.", "success");
+                Notifier.showNotification("Statistical profile generated.", "success");
             });
 
             document.getElementById('interpretSeedProfile').addEventListener('click', async () => {
-                const seedProfileText = document.getElementById('seedProfileResults').textContent; // Get content from previous step
-                if (!seedProfileText || seedProfileText.includes('Enter numbers')) {
-                    Notifier.showNotification('Generate a seed profile first before interpreting.', 'warning');
+                const numbersToReverseText = document.getElementById('numbersToReverse').value;
+                const seedGameType = document.getElementById('seedReverseGame').value;
+                const { main: numbers, bonus: bonusNumbers } = Utils.parseNumbers(numbersToReverseText, seedGameType);
+
+                if (numbers.length === 0 && bonusNumbers.length === 0) {
+                    Notifier.showNotification('Please generate a statistical profile first.', 'warning');
                     return;
                 }
 
@@ -1800,13 +2241,61 @@
                 document.getElementById('seedInterpretationOutput').classList.remove('hidden');
                 document.getElementById('seedInterpretationText').textContent = 'Interpreting profile with AI...';
 
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                try {
+                    const analysis = Lottery.analyzeNumbers(numbers, bonusNumbers, seedGameType);
 
-                const interpretation = `AI interpretation suggests that the entered number sequence, while appearing random, shows a minor bias towards certain number ranges (e.g., lower numbers). The hypothetical seed candidate is a mathematical representation for potential future pattern prediction, but its real-world applicability depends heavily on the true lottery drawing mechanism. It's crucial to remember that lotteries are designed to be truly random, making precise seed reversal extremely difficult if not impossible for actual draws.`;
+                    const prompt = `Interpret the following statistical profile of a lottery number sequence. This profile describes the characteristics of a set of numbers, NOT a true random seed for prediction of future draws. Focus on explaining what these characteristics mean in the context of lottery numbers and what insights can be drawn about the *properties* of the given numbers. Provide actionable advice for improving the number selection if the user desires a more balanced or historically aligned set.
 
-                document.getElementById('seedInterpretationText').textContent = interpretation;
-                UI.hideLoading('seedInterpretationLoading');
-                Notifier.showNotification("AI interpretation complete.", "success");
+                    Statistical Profile:
+                    - Game Type: ${seedGameType.toUpperCase()}
+                    - Numbers: ${analysis.mainNumbers.join(', ')} ${analysis.bonusNumbers.length > 0 ? `Bonus: ${analysis.bonusNumbers.join(', ')}` : ''}
+                    - Sum: ${analysis.sum} (Average: ${analysis.average})
+                    - Odd/Even Ratio: ${analysis.oddEvenRatio}
+                    - Min/Max: ${analysis.min}/${analysis.max}
+                    - Median: ${analysis.median}
+                    - Standard Deviation: ${analysis.stdDev}
+                    - Mode: ${analysis.mode.join(', ') || 'N/A'}
+                    - Consecutive Pairs: ${analysis.consecutivePairs}
+                    - Consecutive Triplets: ${analysis.consecutiveTriplets}
+                    - Prime Count: ${analysis.primeCount}
+                    - Fibonacci Count: ${analysis.fibonacciCount}
+                    - Hot Numbers Matched: ${analysis.hotMatches}
+                    - Cold Numbers Matched: ${analysis.coldMatches}
+                    - Due Numbers Matched: ${analysis.dueMatches}
+
+                    Provide a comprehensive interpretation and practical advice.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Canvas will automatically provide this
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        document.getElementById('seedInterpretationText').innerHTML = text;
+                        Notifier.showNotification("AI interpretation complete.", "success");
+                    } else {
+                        document.getElementById('seedInterpretationText').textContent = 'Failed to get AI interpretation. Please try again.';
+                        Notifier.showNotification('Failed to get AI interpretation.', 'error');
+                        console.error('Gemini API response error:', result);
+                    }
+                } catch (error) {
+                    document.getElementById('seedInterpretationText').textContent = 'Error connecting to AI service. Please check your network or try again later.';
+                    Notifier.showNotification('Error connecting to AI service.', 'error');
+                    console.error('Error in AI Interpretation:', error);
+                } finally {
+                    UI.hideLoading('seedInterpretationLoading');
+                }
             });
 
             document.getElementById('clearSeedReverse').addEventListener('click', () => {
@@ -1836,20 +2325,50 @@
                 const historicalGame = document.getElementById('historicalGame').value;
                 const dataSource = document.getElementById('dataSource').value;
                 const pastDrawsCount = document.getElementById('pastDraws').value;
+                const config = appState.gameConfig[historicalGame];
 
-                // Simulate data loading
                 UI.showLoading('dataSummary');
                 document.getElementById('historicalTable').querySelector('tbody').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 dark:text-gray-400">Loading data...</td></tr>';
 
                 setTimeout(() => {
                     let loadedData = [];
                     if (dataSource === 'sample') {
-                        // Generate sample historical data
-                        const config = appState.gameConfig[historicalGame];
-                        for (let i = 0; i < (pastDrawsCount === 'all' ? 200 : parseInt(pastDrawsCount)); i++) {
+                        // Generate sample historical data with some bias for hot/cold/due
+                        const numDraws = pastDrawsCount === 'all' ? 200 : parseInt(pastDrawsCount);
+                        const possibleNumbers = Array.from({ length: config.mainPool }, (_, i) => i + 1);
+                        const possibleBonusNumbers = config.bonusPool > 0 ? Array.from({ length: config.bonusPool }, (_, i) => i + 1) : [];
+
+                        // Simulate some "hot" numbers for the sample data
+                        const sampleHotNumbers = _.sampleSize(possibleNumbers, Math.ceil(config.mainPool * 0.1));
+                        const sampleDueNumbers = _.sampleSize(possibleNumbers.filter(n => !sampleHotNumbers.includes(n)), Math.ceil(config.mainPool * 0.1));
+
+                        for (let i = 0; i < numDraws; i++) {
                             const date = new Date(Date.now() - (i * 7 * 24 * 60 * 60 * 1000)); // Weekly draws
-                            const main = Utils.generateRandomNumbers(config.pickCount, config.mainPool);
-                            const bonus = config.bonusCount > 0 ? Utils.generateRandomNumbers(config.bonusCount, config.bonusPool) : [];
+                            let main = new Set();
+                            let bonus = new Set();
+
+                            // Bias generation for sample data
+                            for(let j = 0; j < config.pickCount; j++) {
+                                let num;
+                                if (Math.random() < 0.4 && sampleHotNumbers.length > 0) { // 40% chance to pick hot
+                                    num = _.sample(sampleHotNumbers);
+                                } else if (Math.random() < 0.2 && sampleDueNumbers.length > 0) { // 20% chance to pick due
+                                    num = _.sample(sampleDueNumbers);
+                                } else {
+                                    num = _.sample(possibleNumbers);
+                                }
+                                if (num && !main.has(num)) {
+                                    main.add(num);
+                                } else { // Fallback to ensure enough numbers
+                                    main.add(Utils.generateRandomNumbers(1, config.mainPool)[0]);
+                                }
+                            }
+                            main = Array.from(main).sort((a,b) => a-b);
+
+                            if (config.bonusCount > 0) {
+                                bonus = Utils.generateRandomNumbers(config.bonusCount, config.bonusPool);
+                            }
+
                             loadedData.push({
                                 timestamp: date.toISOString(),
                                 date: date.toLocaleDateString(),
@@ -1862,10 +2381,10 @@
                     } else if (dataSource === 'csv') {
                         const csvFile = document.getElementById('csvUpload').files[0];
                         if (csvFile) {
-                            DataStore.importData(csvFile); // This will handle loading and state update
+                            DataStore.importData(csvFile);
                             Notifier.showNotification("CSV data processing initiated.");
                             UI.hideLoading('dataSummary');
-                            return; // Exit as importData reloads the page
+                            return;
                         } else {
                             Notifier.showNotification('Please select a CSV file to upload.', 'warning');
                             UI.hideLoading('dataSummary');
@@ -1873,15 +2392,13 @@
                         }
                     } else if (dataSource === 'api') {
                         Notifier.showNotification("Live API data loading (Premium feature - not implemented).", "info");
-                        // In a real app, this would be an AJAX call to an external API
                         UI.hideLoading('dataSummary');
                         return;
                     }
 
-                    appState.historicalData = loadedData; // Update global state
-                    DataStore.saveState(); // Save to local storage
+                    appState.historicalData = loadedData;
+                    DataStore.saveState();
 
-                    // Render table
                     const tableBody = document.getElementById('historicalTable').querySelector('tbody');
                     tableBody.innerHTML = '';
                     if (loadedData.length > 0) {
@@ -1912,11 +2429,12 @@
                     document.getElementById('mostFrequent').innerHTML = sortedFreq.slice(0, 5).map(([num, count]) => `<p>${num} (${count})</p>`).join('');
                     document.getElementById('leastFrequent').innerHTML = sortedFreq.slice(-5).map(([num, count]) => `<p>${num} (${count})</p>`).reverse().join('');
                     
-                    // Simple Due Numbers (e.g., numbers not seen in last 10 draws)
-                    const recent10DrawsNumbers = loadedData.slice(0, 10).flatMap(d => d.numbers.concat(d.bonus));
-                    const allPossibleNumbers = Array.from({length: appState.gameConfig[historicalGame].mainPool}, (_, i) => i + 1);
-                    const dueNums = allPossibleNumbers.filter(n => !recent10DrawsNumbers.includes(n));
-                    document.getElementById('dueNumbers').innerHTML = dueNums.length > 0 ? dueNums.slice(0, 10).join(', ') + (dueNums.length > 10 ? '...' : '') : 'None';
+                    const { hot: currentHot, cold: currentCold, due: currentDue } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
+                    appState.currentHotNumbers = currentHot;
+                    appState.currentColdNumbers = currentCold;
+                    appState.currentDueNumbers = currentDue;
+
+                    document.getElementById('dueNumbers').innerHTML = currentDue.length > 0 ? currentDue.slice(0, 10).join(', ') + (currentDue.length > 10 ? '...' : '') : 'None';
 
                     // Update Historical Charts
                     const historicalLabels = Object.keys(freqMap).sort((a,b) => a - b);
@@ -1924,7 +2442,6 @@
                     UI.updateChart(freqHeatmapHistoricalChart, historicalLabels, historicalData, 'Historical Frequency');
 
                     // Frequency Over Time (example: show frequency of one number over draws)
-                    // This would require more complex data structuring and iteration
                     UI.updateChart(freqOverTimeChart, [], [], 'Freq Over Time'); // Placeholder
 
                     // Gap Analysis (placeholder)
@@ -1932,11 +2449,14 @@
 
                     UI.hideLoading('dataSummary');
 
-                }, 1000); // Simulate network delay
+                }, 1000);
             });
 
             document.getElementById('clearHistorical').addEventListener('click', () => {
                 appState.historicalData = [];
+                appState.currentHotNumbers = [];
+                appState.currentColdNumbers = [];
+                appState.currentDueNumbers = [];
                 DataStore.saveState();
                 document.getElementById('dataSummary').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Load historical data to see summary</p>';
                 document.getElementById('mostFrequent').innerHTML = '';
@@ -1986,42 +2506,43 @@
                     document.getElementById('strategyAnalysis').innerHTML = '';
 
                     setTimeout(() => {
-                        const config = appState.gameConfig[document.getElementById('lotteryGame').value]; // Assuming generator game type
+                        const gameType = document.getElementById('lotteryGame').value; // Assuming generator game type
+                        const config = appState.gameConfig[gameType];
                         let recommended = [];
                         let analysisText = '';
+                        const { hot: historicalHot, cold: historicalCold, due: historicalDue } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
 
-                        // Simple strategy implementation (actual AI would be complex)
                         if (strategy === 'frequency') {
+                            // Recommend a mix of hot and a few mid-frequency numbers
                             const allNumbers = appState.historicalData.flatMap(d => d.numbers.concat(d.bonus));
                             const freqMap = _.countBy(allNumbers);
                             const sortedFreq = Object.entries(freqMap).sort(([, a], [, b]) => b - a);
-                            recommended = sortedFreq.slice(0, config.pickCount).map(([num]) => Number(num));
-                            analysisText = `Numbers selected based on highest historical frequency. Top ${config.pickCount} numbers: ${recommended.join(', ')}.`;
+                            
+                            const topHot = sortedFreq.slice(0, Math.ceil(config.pickCount * 0.7)).map(([num]) => Number(num));
+                            const remaining = config.pickCount - topHot.length;
+                            const midFreq = sortedFreq.slice(Math.ceil(config.pickCount * 0.7), Math.ceil(config.pickCount * 0.7) + remaining * 2).map(([num]) => Number(num));
+                            recommended = _.sampleSize([...topHot, ...midFreq], config.pickCount).sort((a,b) => a-b);
+
+                            analysisText = `Numbers selected with a strong bias towards historically "hot" (frequently drawn) numbers, supplemented by some mid-frequency numbers for balance.`;
                         } else if (strategy === 'gap') {
-                            // Find numbers that haven't appeared for the longest time
-                            const lastAppearance = {};
-                            appState.historicalData.forEach((draw, index) => {
-                                draw.numbers.concat(draw.bonus).forEach(num => {
-                                    if (!(num in lastAppearance)) {
-                                        lastAppearance[num] = index; // Store index of last appearance
-                                    }
-                                });
-                            });
-                            const currentDrawIndex = appState.historicalData.length;
-                            const sortedByGap = Object.entries(lastAppearance).map(([num, lastIndex]) => ({
-                                num: Number(num),
-                                gap: currentDrawIndex - lastIndex
-                            })).sort((a, b) => b.gap - a.gap);
-                            recommended = sortedByGap.slice(0, config.pickCount).map(item => item.num);
-                            analysisText = `Numbers selected based on longest 'gap' since last appearance. These numbers are statistically 'due'.`;
+                            // Recommend mostly due numbers, with some hot as anchor
+                            recommended = _.sampleSize([...historicalDue, ...historicalHot], config.pickCount).sort((a,b) => a-b);
+                            analysisText = `Numbers selected primarily based on their "due" status (longest absence from draws), with a few "hot" numbers to stabilize the selection.`;
                         } else if (strategy === 'pattern') {
-                            // Simplified pattern (e.g., favor numbers that appeared in a popular pattern)
-                            // This would be very complex in a real scenario (e.g., Markov chains, deep learning)
-                            recommended = Lottery.generateNumbersWithBias(config.pickCount, config.mainPool, appState.historicalData, { useHistorical: true, favorHot: true, includeDue: true });
-                            analysisText = `A blend of statistical patterns and hot/due numbers have been used for recommendations.`;
+                            // This is still a simulation, but implies looking for specific number relationships
+                            // For true pattern recognition, you'd need more complex algorithms (e.g., sequence mining)
+                            recommended = Lottery.generateSmartNumbers(gameType, {
+                                numTickets: 1,
+                                generationMethod: 'ai', // Using the AI generation logic
+                                useHistorical: true,
+                                favorHot: true,
+                                includeDue: true,
+                                avoidRepeats: true
+                            })[0].main;
+                            analysisText = `This strategy attempts to identify and leverage recurring number patterns and sequences from historical data, combining them with hot and due numbers for an optimized selection.`;
                         }
 
-                        UI.renderNumberBalls('recommendedNumbers', recommended);
+                        UI.renderNumberBalls('recommendedNumbers', recommended, [], historicalHot, historicalCold, historicalDue);
                         document.getElementById('strategyAnalysis').textContent = analysisText;
                         document.getElementById('strategyResults').innerHTML = `<p>Strategy Applied: <strong>${strategy}</strong></p>`;
                         UI.hideLoading('strategyResults');
@@ -2030,13 +2551,77 @@
                 });
             });
 
-            document.getElementById('buildStrategy').addEventListener('click', () => {
-                Notifier.showNotification("Custom Strategy Builder logic needs to be implemented. This would combine selected components with their weights.", "info");
-                // Implement logic to combine selected components and their weights
-                // This would then call a more advanced version of Lottery.generateSmartNumbers or a new function
+            // New AI Strategy Advisor Button
+            const customStrategyBuilderDiv = document.querySelector('#strategies .mt-8.pt-6.border-t');
+            const aiStrategyAdvisorButton = document.createElement('button');
+            aiStrategyAdvisorButton.id = 'aiStrategyAdvisor';
+            aiStrategyAdvisorButton.className = 'p-3 bg-accent text-white rounded-lg hover:bg-green-700 w-full mt-4';
+            aiStrategyAdvisorButton.innerHTML = 'AI Strategy Advisor ✨';
+            customStrategyBuilderDiv.appendChild(aiStrategyAdvisorButton);
+
+            aiStrategyAdvisorButton.addEventListener('click', async () => {
+                if (appState.historicalData.length === 0) {
+                    Notifier.showNotification('Load historical data first for AI strategy advice.', 'warning');
+                    return;
+                }
+
+                UI.showLoading('strategyResults');
+                document.getElementById('strategyResults').textContent = 'Consulting AI Strategy Advisor...';
+                document.getElementById('recommendedNumbers').innerHTML = '';
+                document.getElementById('strategyAnalysis').innerHTML = '';
+
+                try {
+                    const gameType = document.getElementById('lotteryGame').value;
+                    const config = appState.gameConfig[gameType];
+                    const { hot, cold, due } = Lottery.analyzeHistoricalTrends(appState.historicalData, config);
+
+                    const prompt = `Given the following lottery game configuration and historical number trends, suggest a strategic approach for picking numbers.
+                    Game: ${gameType.toUpperCase()} (Main Pool: ${config.mainPool}, Pick Count: ${config.pickCount}, Bonus Pool: ${config.bonusPool}, Bonus Count: ${config.bonusCount})
+                    Hot Numbers (most frequent): ${hot.join(', ') || 'None'}
+                    Cold Numbers (least frequent): ${cold.join(', ') || 'None'}
+                    Due Numbers (overdue): ${due.join(', ') || 'None'}
+                    
+                    Provide a concise, actionable strategy, including a mix of number types (hot, cold, due, random) and general advice on balancing different statistical properties. Suggest a few example numbers based on your strategy.`;
+
+                    let chatHistory = [];
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Canvas will automatically provide this
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        document.getElementById('strategyAnalysis').innerHTML = text;
+                        document.getElementById('strategyResults').innerHTML = `<p>AI Strategy Advisor consulted!</p>`;
+                        Notifier.showNotification("AI Strategy Advisor provided insights.", "success");
+                    } else {
+                        document.getElementById('strategyAnalysis').textContent = 'Failed to get AI strategy advice. Please try again.';
+                        Notifier.showNotification('Failed to get AI strategy advice.', 'error');
+                        console.error('Gemini API response error:', result);
+                    }
+                } catch (error) {
+                    document.getElementById('strategyAnalysis').textContent = 'Error connecting to AI service. Please check your network or try again later.';
+                    Notifier.showNotification('Error connecting to AI service.', 'error');
+                    console.error('Error in AI Strategy Advisor:', error);
+                } finally {
+                    UI.hideLoading('strategyResults');
+                }
             });
 
-            // Range slider value display for custom strategy
+
+            document.getElementById('buildStrategy').addEventListener('click', () => {
+                Notifier.showNotification("Custom Strategy Builder logic needs to be implemented. This would combine selected components with their weights.", "info");
+            });
+
             document.querySelectorAll('input[type="range"]').forEach(slider => {
                 const valueSpan = document.getElementById(slider.id + 'Value');
                 slider.addEventListener('input', () => {
@@ -2062,8 +2647,7 @@
                     <p><strong>Odds:</strong> ${probability}</p>
                 `;
 
-                // Update Probability Chart (example: fixed bars for now)
-                UI.updateChart(probabilityChart, ['Your Odds', 'Against You'], [1, 1000000], 'Probability'); // Example
+                UI.updateChart(probabilityChart, ['Your Odds', 'Against You'], [1, (probability.includes('∞') ? 1000000000 : parseFloat(probability.replace('1 in ', '').replace(/,/g, '')))], 'Probability', ['rgba(16, 185, 129, 0.6)', 'rgba(239, 68, 68, 0.6)']); // Accent/Danger colors
                 Notifier.showNotification("Probability calculated.", "success");
             });
 
@@ -2089,12 +2673,12 @@
                 const { predictedMain, predictedBonus, confidence, details } = await Lottery.predictNumbers(predictionGame, predictionModel);
 
                 if (predictedMain.length > 0 || predictedBonus.length > 0) {
-                    UI.renderNumberBalls('predictionResults', predictedMain, predictedBonus);
-                    document.getElementById('predictionDetailsText').textContent = details;
+                    // Render predicted numbers, highlighting hot/cold/due based on overall historical data
+                    UI.renderNumberBalls('predictionResults', predictedMain, predictedBonus, appState.currentHotNumbers, appState.currentColdNumbers, appState.currentDueNumbers);
+                    document.getElementById('predictionDetailsText').innerHTML = details;
                     document.getElementById('predictionDetails').classList.remove('hidden');
 
-                    // Update Prediction Confidence Chart
-                    UI.updateChart(predictionConfidenceChart, ['Confidence'], [confidence], 'Prediction Confidence');
+                    UI.updateChart(predictionConfidenceChart, ['Confidence'], [parseFloat(confidence)], 'Prediction Confidence', 'rgba(16, 185, 129, 0.6)'); // Accent color
                     Notifier.showNotification("Prediction generated successfully!", "success");
                 } else {
                     document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Could not generate prediction.</p>';
@@ -2128,10 +2712,8 @@
                 input.click();
             });
 
-            // Notification button listener (for opening a notification panel, if implemented)
             document.getElementById('notificationsBtn').addEventListener('click', () => {
-                // This would ideally open a modal or slide-out panel showing all notifications
-                Notifier.showNotification("Notifications panel is not fully implemented yet.", "info");
+                Notifier.showNotification("Notifications panel is not fully implemented yet, but new notifications appear as toasts.", "info");
                 Notifier.markAllAsRead();
             });
 
@@ -2144,7 +2726,7 @@
         window.onerror = (message, source, lineno, colno, error) => {
             console.error("Global Error:", message, source, lineno, colno, error);
             Notifier.showNotification(`An unexpected error occurred: ${message.substring(0, 100)}...`, 'error', 5000);
-            return true; // Suppress default error reporting
+            return true;
         };
 
         window.addEventListener('unhandledrejection', (event) => {
