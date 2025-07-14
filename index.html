@@ -76,11 +76,8 @@
 
         /* Responsive adjustments for main content area */
         @media (min-width: 768px) { /* md breakpoint */
-            .main-content-area.md\:ml-64 { /* Only apply if md:ml-64 class is present */
+            .main-content-area {
                 margin-left: 16rem; /* Equivalent to md:ml-64 */
-            }
-            .main-content-area.ml-0 { /* Ensure it's 0 when sidebar is hidden on desktop */
-                margin-left: 0;
             }
         }
         /* General button styling for better touch targets */
@@ -694,10 +691,10 @@
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
                                 <option value="lotto649">Lotto 6/49</option>
                                 <option value="lotto645">Lotto 6/45</option>
-                                <option value="custom">Custom Game</option> <!-- Added Custom Game option here -->
+                                <option value="custom">Custom Game</option> <!-- Added Custom Game option -->
                             </select>
                         </div>
-                        
+
                         <!-- Custom Game Configuration for Historical Data -->
                         <div id="customHistoricalGameConfig" class="grid grid-cols-2 gap-2 hidden">
                             <div>
@@ -717,14 +714,13 @@
                                 <input id="historicalBonusCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1">
                             </div>
                         </div>
-
+                        
                         <div>
                             <label class="block text-sm font-medium">Data Source</label>
                             <select id="dataSource" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="sample">Sample Data (Built-in)</option>
                                 <option value="api">Live API (Premium)</option>
                                 <option value="csv">Upload CSV</option>
-                                <option value="manual">Manual Input</option> <!-- New option for manual input -->
                             </select>
                         </div>
                         
@@ -732,14 +728,6 @@
                             <label class="block text-sm font-medium">Upload CSV File</label>
                             <input id="csvUpload" type="file" accept=".csv" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">CSV format: Date,Number1,Number2,...,Bonus1,Bonus2</p>
-                        </div>
-
-                        <!-- New Manual Input Container -->
-                        <div id="manualInputContainer" class="hidden">
-                            <label class="block text-sm font-medium">Input Draws Manually</label>
-                            <textarea id="manualDrawsInput" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter draws, one per line. Format: YYYY-MM-DD,N1,N2,N3,N4,N5,B1 (e.g., 2023-01-01,5,12,23,34,45,6)"></textarea>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separate numbers with commas. Bonus numbers at the end.</p>
-                            <button id="addManualDraws" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 w-full mt-2">Add Draws</button>
                         </div>
                         
                         <div>
@@ -1325,11 +1313,6 @@
             initEventListeners();
             loadSettings();
             updateUI();
-            // Ensure custom game configs are hidden/shown on initial load based on default game
-            handleGameChange({ target: document.getElementById('lotteryGame') });
-            handleHistoricalGameChange({ target: document.getElementById('historicalGame') });
-            handleAnalyzerGameChange({ target: document.getElementById('analyzerGame') });
-            handleProbabilityGameChange({ target: document.getElementById('probabilityGame') });
         }
 
         // Initialize Charts
@@ -1398,7 +1381,7 @@
             document.getElementById('lotteryGame').addEventListener('change', handleGameChange);
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
             document.getElementById('analyzerGame').addEventListener('change', handleAnalyzerGameChange); // New event listener for analyzer game
-            document.getElementById('historicalGame').addEventListener('change', handleHistoricalGameChange); // Added event listener for historical game
+            document.getElementById('historicalGame').addEventListener('change', handleHistoricalGameChange); // New event listener for historical game
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
             document.getElementById('reverseGame').addEventListener('change', () => { /* No specific action needed for game change yet */ });
             
@@ -1447,7 +1430,6 @@
             document.getElementById('prevPage').addEventListener('click', prevPage);
             document.getElementById('nextPage').addEventListener('click', nextPage);
             document.getElementById('exportHistorical').addEventListener('click', exportHistoricalData);
-            document.getElementById('addManualDraws').addEventListener('click', addManualDraws); // New event listener for manual input
             
             // Strategy Controls
             document.querySelectorAll('.applyStrategy').forEach(btn => {
@@ -1499,8 +1481,8 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.querySelector('.main-content-area');
             sidebar.classList.toggle('sidebar-hidden');
+            const mainContent = document.querySelector('.main-content-area');
             if (sidebar.classList.contains('sidebar-hidden')) {
                 mainContent.classList.remove('md:ml-64');
                 mainContent.classList.add('ml-0');
@@ -1584,12 +1566,6 @@
             
             if (game === 'custom') {
                 customConfig.classList.remove('hidden');
-                // Populate custom fields with current game's values or defaults
-                const currentConfig = gameConfigs[document.getElementById('lotteryGame').value === 'custom' ? 'powerball' : document.getElementById('lotteryGame').value];
-                document.getElementById('mainPool').value = currentConfig.mainPool;
-                document.getElementById('pickCount').value = currentConfig.pickCount;
-                document.getElementById('bonusPool').value = currentConfig.bonusPool;
-                document.getElementById('bonusCount').value = currentConfig.bonusCount;
             } else {
                 customConfig.classList.add('hidden');
                 const config = gameConfigs[game];
@@ -1606,11 +1582,6 @@
             
             if (game === 'custom') {
                 customConfig.classList.remove('hidden');
-                const currentConfig = gameConfigs[document.getElementById('probabilityGame').value === 'custom' ? 'powerball' : document.getElementById('probabilityGame').value];
-                document.getElementById('probMainPool').value = currentConfig.mainPool;
-                document.getElementById('probPickCount').value = currentConfig.pickCount;
-                document.getElementById('probBonusPool').value = currentConfig.bonusPool;
-                document.getElementById('probBonusCount').value = currentConfig.bonusCount;
             } else {
                 customConfig.classList.add('hidden');
                 const config = gameConfigs[game];
@@ -1627,7 +1598,7 @@
             
             if (game === 'custom') {
                 customConfig.classList.remove('hidden');
-                const currentConfig = gameConfigs[document.getElementById('analyzerGame').value === 'custom' ? 'powerball' : document.getElementById('analyzerGame').value];
+                const currentConfig = gameConfigs[document.getElementById('analyzerGame').value];
                 document.getElementById('analyzerMainPool').value = currentConfig.mainPool;
                 document.getElementById('analyzerPickCount').value = currentConfig.pickCount;
                 document.getElementById('analyzerBonusPool').value = currentConfig.bonusPool;
@@ -1637,38 +1608,31 @@
             }
         }
 
-        // New function for handling historical game type change
         function handleHistoricalGameChange(e) {
             const game = e.target.value;
-            const customConfigDiv = document.getElementById('customHistoricalGameConfig');
-
+            const customConfig = document.getElementById('customHistoricalGameConfig');
+            
             if (game === 'custom') {
-                customConfigDiv.classList.remove('hidden');
-                // Populate with current game's values or defaults if switching to custom
-                const currentConfig = gameConfigs[document.getElementById('historicalGame').value === 'custom' ? 'powerball' : document.getElementById('historicalGame').value];
+                customConfig.classList.remove('hidden');
+                // Populate custom fields with current game's default values if available
+                const currentConfig = gameConfigs[document.getElementById('historicalGame').value];
                 document.getElementById('historicalMainPool').value = currentConfig.mainPool;
                 document.getElementById('historicalPickCount').value = currentConfig.pickCount;
                 document.getElementById('historicalBonusPool').value = currentConfig.bonusPool;
                 document.getElementById('historicalBonusCount').value = currentConfig.bonusCount;
             } else {
-                customConfigDiv.classList.add('hidden');
+                customConfig.classList.add('hidden');
             }
         }
 
         function handleDataSourceChange(e) {
             const source = e.target.value;
             const csvUploadContainer = document.getElementById('csvUploadContainer');
-            const manualInputContainer = document.getElementById('manualInputContainer'); // Get manual input container
             
-            // Hide all containers first
-            csvUploadContainer.classList.add('hidden');
-            manualInputContainer.classList.add('hidden');
-
-            // Show relevant container based on selection
             if (source === 'csv') {
                 csvUploadContainer.classList.remove('hidden');
-            } else if (source === 'manual') { // Show manual input if selected
-                manualInputContainer.classList.remove('hidden');
+            } else {
+                csvUploadContainer.classList.add('hidden');
             }
         }
 
@@ -1684,9 +1648,7 @@
             switch (method) {
                 case 'standard':
                 case 'quick':
-                    // Generate numbers and ensure uniqueness
-                    const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-                    numbers = _.sampleSize(allNumbers, pickCount);
+                    numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
                     break;
                     
                 case 'fisherYates':
@@ -1700,85 +1662,54 @@
                     
                 case 'crypto':
                     if (window.crypto) {
-                        const uniqueNums = new Set();
-                        while (uniqueNums.size < pickCount) {
-                            const randomBytes = new Uint32Array(1);
-                            window.crypto.getRandomValues(randomBytes);
-                            const num = (randomBytes[0] % mainPool) + 1;
-                            uniqueNums.add(num);
-                        }
-                        numbers = Array.from(uniqueNums);
+                        const array = new Uint32Array(pickCount);
+                        window.crypto.getRandomValues(array);
+                        numbers = Array.from(array).map(n => (n % mainPool) + 1);
                     } else {
-                        // Fallback if crypto is not available
-                        const allNums = Array.from({ length: mainPool }, (_, i) => i + 1);
-                        numbers = _.sampleSize(allNums, pickCount);
+                        numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
                     }
                     break;
                     
                 case 'lowHigh':
-                    const lowHalf = Array.from({ length: Math.floor(mainPool / 2) }, (_, i) => i + 1);
-                    const highHalf = Array.from({ length: mainPool - Math.floor(mainPool / 2) }, (_, i) => Math.floor(mainPool / 2) + i + 1);
-                    
-                    const lowCount = Math.ceil(pickCount / 2);
+                    const lowCount = Math.floor(pickCount / 2);
                     const highCount = pickCount - lowCount;
-
-                    let selectedLow = _.sampleSize(lowHalf, Math.min(lowCount, lowHalf.length));
-                    let selectedHigh = _.sampleSize(highHalf, Math.min(highCount, highHalf.length));
-                    numbers = [...selectedLow, ...selectedHigh];
-                    
-                    // Ensure uniqueness and correct count
-                    numbers = [...new Set(numbers)];
-                    while (numbers.length < pickCount) {
-                        const remainingPool = Array.from({ length: mainPool }, (_, i) => i + 1).filter(n => !numbers.includes(n));
-                        if (remainingPool.length === 0) break; // No more numbers to pick
-                        numbers.push(_.sample(remainingPool));
-                    }
-                    numbers = numbers.slice(0, pickCount);
+                    const low = Array.from({ length: lowCount }, () => Math.floor(Math.random() * (mainPool / 2)) + 1);
+                    const high = Array.from({ length: highCount }, () => Math.floor(Math.random() * (mainPool / 2)) + Math.ceil(mainPool / 2));
+                    numbers = [...low, ...high];
                     break;
                     
                 case 'oddEven':
-                    const oddNumbers = Array.from({ length: mainPool }, (_, i) => i + 1).filter(n => n % 2 !== 0);
-                    const evenNumbers = Array.from({ length: mainPool }, (_, i) => i + 1).filter(n => n % 2 === 0);
-
-                    const targetOddCount = Math.round(pickCount / 2);
-                    const targetEvenCount = pickCount - targetOddCount;
-
-                    let selectedOdds = _.sampleSize(oddNumbers, Math.min(targetOddCount, oddNumbers.length));
-                    let selectedEvens = _.sampleSize(evenNumbers, Math.min(targetEvenCount, evenNumbers.length));
-                    numbers = [...selectedOdds, ...selectedEvens];
-
-                    // Ensure uniqueness and correct count
-                    numbers = [...new Set(numbers)];
-                    while (numbers.length < pickCount) {
-                        const remainingPool = Array.from({ length: mainPool }, (_, i) => i + 1).filter(n => !numbers.includes(n));
-                        if (remainingPool.length === 0) break;
-                        numbers.push(_.sample(remainingPool));
-                    }
-                    numbers = numbers.slice(0, pickCount);
+                    const oddCount = Math.floor(pickCount / 2);
+                    const evenCount = pickCount - oddCount;
+                    const odd = Array.from({ length: oddCount }, () => {
+                        let num;
+                        do {
+                            num = Math.floor(Math.random() * mainPool) + 1;
+                        } while (num % 2 === 0);
+                        return num;
+                    });
+                    const even = Array.from({ length: evenCount }, () => {
+                        let num;
+                        do {
+                            num = Math.floor(Math.random() * mainPool) + 1;
+                        } while (num % 2 === 1);
+                        return num;
+                    });
+                    numbers = [...odd, ...even];
                     break;
                     
                 case 'prime':
                     const primes = getPrimesUpTo(mainPool);
-                    numbers = _.sampleSize(primes, Math.min(pickCount, primes.length));
-                    // Fill if not enough primes
-                    while (numbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!numbers.includes(randomNum)) {
-                            numbers.push(randomNum);
-                        }
-                    }
+                    numbers = Array.from({ length: pickCount }, () => {
+                        return primes[Math.floor(Math.random() * primes.length)];
+                    });
                     break;
                     
                 case 'fibonacci':
                     const fibs = getFibonacciUpTo(mainPool);
-                    numbers = _.sampleSize(fibs, Math.min(pickCount, fibs.length));
-                    // Fill if not enough fibs
-                    while (numbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!numbers.includes(randomNum)) {
-                            numbers.push(randomNum);
-                        }
-                    }
+                    numbers = Array.from({ length: pickCount }, () => {
+                        return fibs[Math.floor(Math.random() * fibs.length)];
+                    });
                     break;
                     
                 case 'statistical':
@@ -1791,14 +1722,11 @@
                     break;
                     
                 default:
-                    const defaultPool = Array.from({ length: mainPool }, (_, i) => i + 1);
-                    numbers = _.sampleSize(defaultPool, pickCount);
+                    numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
             }
 
-            // Ensure uniqueness and sort after generation
             numbers = [...new Set(numbers)].sort((a, b) => a - b);
             
-            // Fill any missing numbers if filters or AI failed to provide enough
             while (numbers.length < pickCount) {
                 const randomNum = Math.floor(Math.random() * mainPool) + 1;
                 if (!numbers.includes(randomNum)) {
@@ -1807,34 +1735,20 @@
                 numbers.sort((a, b) => a - b);
             }
 
-            // Apply sum filter (re-generate if not met, up to a few attempts)
             if (options.sumFilter && options.sumFilter !== 'any') {
                 const sum = numbers.reduce((a, b) => a + b, 0);
-                const avgExpectedSum = mainPool / 2 * pickCount; // Theoretical average sum
+                const avg = mainPool / 2 * pickCount;
                 
                 let isValid = true;
                 switch (options.sumFilter) {
-                    case 'low': isValid = sum < avgExpectedSum * 0.8; break;
-                    case 'medium': isValid = sum >= avgExpectedSum * 0.8 && sum <= avgExpectedSum * 1.2; break;
-                    case 'high': isValid = sum > avgExpectedSum * 1.2; break;
-                    // Custom range logic would go here if implemented
+                    case 'low': isValid = sum < avg * 0.8; break;
+                    case 'medium': isValid = sum >= avg * 0.8 && sum <= avg * 1.2; break;
+                    case 'high': isValid = sum > avg * 1.2; break;
                 }
                 
-                if (!isValid) {
-                    // Recursive call with a limit to prevent infinite loops
-                    let attempts = (options._sumFilterAttempts || 0) + 1;
-                    if (attempts < 5) { // Limit regeneration attempts
-                        options._sumFilterAttempts = attempts;
-                        return generateNumbers(config, method, options);
-                    } else {
-                        // If after several attempts, filter is not met, just return what we have
-                        console.warn("Sum filter could not be satisfied after multiple attempts.");
-                    }
-                }
-                delete options._sumFilterAttempts; // Clean up temp property
+                if (!isValid) return generateNumbers(config, method, options);
             }
             
-            // Apply consecutive filter (re-generate if not met, up to a few attempts)
             if (options.consecutiveFilter && options.consecutiveFilter !== 'any') {
                 const consecutivePairs = countConsecutivePairs(numbers);
                 let isValid = true;
@@ -1845,16 +1759,7 @@
                     case 'max2': isValid = consecutivePairs <= 2; break;
                 }
                 
-                if (!isValid) {
-                    let attempts = (options._consecutiveFilterAttempts || 0) + 1;
-                    if (attempts < 5) { // Limit regeneration attempts
-                        options._consecutiveFilterAttempts = attempts;
-                        return generateNumbers(config, method, options);
-                    } else {
-                        console.warn("Consecutive filter could not be satisfied after multiple attempts.");
-                    }
-                }
-                delete options._consecutiveFilterAttempts; // Clean up temp property
+                if (!isValid) return generateNumbers(config, method, options);
             }
 
             const bonus = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
@@ -1916,14 +1821,12 @@
                 } else {
                     console.error("Gemini API did not return expected content structure.");
                     showNotification("AI generation failed. Falling back to random numbers.");
-                    const allNums = Array.from({ length: mainPool }, (_, i) => i + 1);
-                    generatedNumbers = _.sampleSize(allNums, pickCount);
+                    generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI generation:", error);
                 showNotification("AI generation failed due to an error. Falling back to random numbers.");
-                const allNums = Array.from({ length: mainPool }, (_, i) => i + 1);
-                generatedNumbers = _.sampleSize(allNums, pickCount);
+                generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
             } finally {
                 if (loadingIndicator) loadingIndicator.classList.add('hidden');
             }
@@ -1947,56 +1850,32 @@
             try {
                 if (appState.historicalData.length === 0) {
                     showNotification("No historical data for Quantum-Inspired algorithm. Please load data first.");
-                    const allNums = Array.from({ length: mainPool }, (_, i) => i + 1);
-                    return _.sampleSize(allNums, pickCount);
+                    return Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
                 }
 
-                // Get historical data analysis
+                const numberScores = {};
+                for (let i = 1; i <= mainPool; i++) {
+                    numberScores[i] = 0;
+                }
+
+                // Step 1: Calculate "Quantum State" (Probability Scores)
+                // Combine frequency and gap analysis
                 const frequency = getNumberFrequency();
                 const gaps = getGapAnalysis();
                 const pairFrequency = getPairFrequency();
-                const primes = getPrimesUpTo(mainPool);
-                const fibs = getFibonacciUpTo(mainPool);
 
-                // Calculate positional frequency
-                const positionalFrequency = {};
-                for (let i = 0; i < pickCount; i++) {
-                    positionalFrequency[i] = {};
-                    for (let j = 1; j <= mainPool; j++) {
-                        positionalFrequency[i][j] = 0;
-                    }
-                }
-                appState.historicalData.forEach(draw => {
-                    draw.numbers.forEach((num, index) => {
-                        if (positionalFrequency[index]) {
-                            positionalFrequency[index][num] = (positionalFrequency[index][num] || 0) + 1;
-                        }
-                    });
-                });
-
-                // Determine max values for normalization
                 const maxFreq = Math.max(...Object.values(frequency), 1);
                 const maxGap = Math.max(...Object.values(gaps), 1);
                 const maxPairFreq = Math.max(...Object.values(pairFrequency), 1);
 
-                // Initial "Quantum State" (Probability Scores) for all numbers
-                let numberScores = {};
                 for (let i = 1; i <= mainPool; i++) {
-                    numberScores[i] = 0;
+                    let score = 0;
 
-                    // Frequency contribution (higher weight for recent data)
-                    const recentDrawsCount = Math.min(appState.historicalData.length, 50); // Consider last 50 draws as "recent"
-                    const recentFrequency = {};
-                    appState.historicalData.slice(-recentDrawsCount).forEach(draw => {
-                        draw.numbers.forEach(num => {
-                            recentFrequency[num] = (recentFrequency[num] || 0) + 1;
-                        });
-                    });
-                    const maxRecentFreq = Math.max(...Object.values(recentFrequency), 1);
-                    numberScores[i] += ((recentFrequency[i] || 0) / maxRecentFreq) * 0.4; // 40% importance for recent freq
+                    // Frequency contribution
+                    score += (frequency[i] || 0) / maxFreq * 0.4; // 40% importance
 
                     // Gap contribution (higher gap means more "due")
-                    numberScores[i] += (gaps[i] || 0) / maxGap * 0.25; // 25% importance
+                    score += (gaps[i] || 0) / maxGap * 0.3; // 30% importance
 
                     // Pair correlation contribution (entanglement-like)
                     let pairScore = 0;
@@ -2006,94 +1885,53 @@
                             pairScore += pairFrequency[pair];
                         }
                     }
-                    numberScores[i] += (pairScore / maxPairFreq) * 0.15; // 15% importance
+                    score += (pairScore / maxPairFreq) * 0.2; // 20% importance
 
-                    // Prime and Fibonacci Bias
-                    if (primes.includes(i)) numberScores[i] += 0.05; // 5% bias
-                    if (fibs.includes(i)) numberScores[i] += 0.05; // 5% bias
+                    // Step 2: Introduce "Quantum Fluctuations" (controlled randomness)
+                    score += Math.random() * 0.1; // 10% randomness for exploration
 
-                    // Initial "Quantum Fluctuations" (controlled randomness)
-                    numberScores[i] += Math.random() * 0.05; // 5% randomness for exploration
+                    numberScores[i] = score;
                 }
 
-                // Iterative "Measurement" (Selection) with "Quantum Annealing"
-                let availableNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-                let currentTemperature = 1.0; // Starting temperature for annealing
-                const coolingRate = 0.95; // Cooling rate
+                // Step 3 & 4: "Measure" (Select Numbers)
+                const sortedNumbers = Object.entries(numberScores)
+                    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+                    .map(([num]) => parseInt(num));
 
-                for (let k = 0; k < pickCount; k++) {
-                    // Filter available numbers based on current selection
-                    const currentAvailableScores = availableNumbers.reduce((acc, num) => {
-                        acc[num] = numberScores[num];
-                        return acc;
-                    }, {});
+                generatedNumbers = [];
+                let attempts = 0;
+                const maxAttempts = 100; // Prevent infinite loops
 
-                    // Adjust scores based on positional frequency for the current slot (k)
-                    const maxPosFreq = Math.max(...Object.values(positionalFrequency[k] || {}), 1);
-                    for (const num of availableNumbers) {
-                        if (positionalFrequency[k] && positionalFrequency[k][num]) {
-                            currentAvailableScores[num] += (positionalFrequency[k][num] / maxPosFreq) * 0.05; // 5% positional bias
-                        }
-                    }
-
-                    // Sort numbers by score
-                    const sortedCandidates = Object.entries(currentAvailableScores)
-                        .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
-                        .map(([num]) => parseInt(num));
-
-                    let selectedNum = null;
-                    let attempts = 0;
-                    const maxSelectionAttempts = 100; // Prevent infinite loops during selection
-
-                    while (selectedNum === null && attempts < maxSelectionAttempts) {
-                        // Probabilistic selection based on scores and temperature
-                        const totalScore = sortedCandidates.reduce((sum, num) => sum + currentAvailableScores[num], 0);
+                while (generatedNumbers.length < pickCount && attempts < maxAttempts) {
+                    // Select from the top-scoring numbers, but also allow some lower-scoring ones
+                    // This simulates a probabilistic "collapse" of the quantum state
+                    const selectionPool = sortedNumbers.slice(0, Math.min(mainPool, pickCount * 3)); // Consider top N*3 numbers
+                    
+                    let selectedNum;
+                    if (selectionPool.length > 0) {
+                        // Weighted random selection from the pool
+                        const totalScore = selectionPool.reduce((sum, num) => sum + numberScores[num], 0);
                         let randomPoint = Math.random() * totalScore;
 
-                        for (const num of sortedCandidates) {
-                            const adjustedScore = currentAvailableScores[num] * currentTemperature; // Apply temperature
-                            randomPoint -= adjustedScore;
+                        for (const num of selectionPool) {
+                            randomPoint -= numberScores[num];
                             if (randomPoint <= 0) {
                                 selectedNum = num;
                                 break;
                             }
                         }
-
-                        // If selectedNum is still null (due to floating point or very low scores), pick randomly from top few
-                        if (selectedNum === null && sortedCandidates.length > 0) {
-                            selectedNum = sortedCandidates[Math.floor(Math.random() * Math.min(5, sortedCandidates.length))];
-                        }
-
-                        // Diversity Constraint: If the selected number creates too many consecutive numbers
-                        // or violates other balance rules (e.g., odd/even balance), re-evaluate.
-                        // This is a simplified check; more complex rules can be added.
-                        const tempNumbers = [...generatedNumbers, selectedNum].sort((a, b) => a - b);
-                        if (config.optimal && countConsecutivePairs(tempNumbers) > config.optimal.consecutiveMax + 1) { // Allow slight deviation
-                            selectedNum = null; // Reject this selection, try again
-                        }
-                        
-                        attempts++;
-                    }
-
-                    if (selectedNum !== null) {
-                        generatedNumbers.push(selectedNum);
-                        availableNumbers = availableNumbers.filter(n => n !== selectedNum); // Remove selected from pool
                     } else {
-                        // Fallback if selection fails after many attempts (should be rare)
-                        const fallbackNum = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
-                        if (fallbackNum) {
-                            generatedNumbers.push(fallbackNum);
-                            availableNumbers = availableNumbers.filter(n => n !== fallbackNum);
-                        } else {
-                            // If no available numbers, break
-                            break;
-                        }
+                        // Fallback to pure random if selection pool is empty
+                        selectedNum = Math.floor(Math.random() * mainPool) + 1;
                     }
 
-                    currentTemperature *= coolingRate; // Cool down the "temperature"
+                    if (selectedNum && !generatedNumbers.includes(selectedNum)) {
+                        generatedNumbers.push(selectedNum);
+                    }
+                    attempts++;
                 }
 
-                // Ensure pickCount is met, fill with random if necessary (shouldn't happen often)
+                // Ensure pickCount is met, fill with random if necessary (shouldn't happen often with good scoring)
                 while (generatedNumbers.length < pickCount) {
                     const randomNum = Math.floor(Math.random() * mainPool) + 1;
                     if (!generatedNumbers.includes(randomNum)) {
@@ -2101,12 +1939,11 @@
                     }
                 }
 
-                generatedNumbers = generatedNumbers.slice(0, pickCount).sort((a, b) => a - b); // Trim and sort
+                generatedNumbers = generatedNumbers.slice(0, pickCount); // Trim if somehow over
             } catch (error) {
                 console.error("Error in Quantum-Inspired generation:", error);
                 showNotification("Quantum-Inspired generation failed. Falling back to random numbers.");
-                const allNums = Array.from({ length: mainPool }, (_, i) => i + 1);
-                generatedNumbers = _.sampleSize(allNums, pickCount);
+                generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
             } finally {
                 if (loadingIndicator) loadingIndicator.classList.add('hidden');
             }
@@ -2147,34 +1984,12 @@
         function generateWheelingSystem(config, numTickets) {
             const { mainPool, pickCount, bonusCount, bonusPool } = config;
             const wheel = [];
+            const baseNumbers = Array.from({ length: pickCount + 2 }, () => Math.floor(Math.random() * mainPool) + 1);
             
-            // Generate a base set of numbers slightly larger than pickCount for variation
-            const baseNumbersPool = Array.from({ length: mainPool }, (_, i) => i + 1);
-            const baseNumbers = _.sampleSize(baseNumbersPool, pickCount + Math.min(2, mainPool - pickCount)); // Ensure enough numbers to wheel
-
             for (let i = 0; i < numTickets; i++) {
-                // Simple shifting/rotation for demonstration. A real wheeling system is more complex.
-                const shiftedNumbers = baseNumbers.map(n => {
-                    let newNum = n + i;
-                    while (newNum > mainPool) {
-                        newNum -= mainPool; // Wrap around
-                    }
-                    return newNum;
-                });
-                
-                const ticketNumbers = [...new Set(shiftedNumbers)].slice(0, pickCount).sort((a, b) => a - b);
-                
-                // If not enough unique numbers after shift, fill with random unique numbers
-                while (ticketNumbers.length < pickCount) {
-                    const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                    if (!ticketNumbers.includes(randomNum)) {
-                        ticketNumbers.push(randomNum);
-                    }
-                }
-                ticketNumbers.sort((a, b) => a - b); // Re-sort after filling
-
+                const ticket = [...new Set(baseNumbers.map(n => (n + i) % mainPool + 1))].slice(0, pickCount).sort((a, b) => a - b);
                 const bonus = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
-                wheel.push({ numbers: ticketNumbers, bonus: bonus.sort((a,b)=>a-b) });
+                wheel.push({ numbers: ticket, bonus });
             }
             
             return wheel;
@@ -2183,15 +1998,12 @@
         // Generator Functions
         async function generateSmartNumbers() {
             const game = document.getElementById('lotteryGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('mainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('pickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('mainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('pickCount').value) || 5,
+                bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
+                bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
+            } : gameConfigs[game];
             
             const method = document.getElementById('generationMethod').value;
             const options = {
@@ -2230,15 +2042,12 @@
 
         async function quickPick() {
             const game = document.getElementById('lotteryGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('mainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('pickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('mainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('pickCount').value) || 5,
+                bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
+                bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
+            } : gameConfigs[game];
             
             const tickets = [await generateNumbers(config, 'quick', {})];
             displayTickets(tickets);
@@ -2249,15 +2058,12 @@
 
         async function generateWheelingSystem() {
             const game = document.getElementById('lotteryGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('mainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('pickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('mainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('pickCount').value) || 5,
+                bonusPool: parseInt(document.getElementById('bonusPool').value) || 26,
+                bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
+            } : gameConfigs[game];
             
             const numTickets = parseInt(document.getElementById('numTickets').value) || 1;
             const tickets = generateWheelingSystem(config, numTickets);
@@ -2341,7 +2147,7 @@
             document.getElementById('generatedTickets').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate some numbers to see results</p>';
             
             ['numberFrequencyChart', 'sumAnalysisChart', 'patternAnalysisChart'].forEach(id => {
-                   if (charts[id]) {
+                 if (charts[id]) {
                     charts[id].data.labels = [];
                     charts[id].data.datasets[0].data = [];
                     charts[id].update();
@@ -2384,7 +2190,7 @@
                 csvContent += `Ticket ${index + 1},"${numbers.join(',')}","${bonus.join(',')}"\n`;
             });
             
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             downloadBlob(blob, 'tickets.csv');
             showNotification('Tickets exported as CSV!');
         }
@@ -2452,7 +2258,7 @@
             }
             
             const game = document.getElementById('analyzerGame').value;
-            let config; // Declare config with let
+            let config;
 
             if (game === 'custom') {
                 config = {
@@ -2541,7 +2347,7 @@
             }
 
             const game = document.getElementById('analyzerGame').value;
-            let config; // Declare config with let
+            let config;
 
             if (game === 'custom') {
                 config = {
@@ -2649,82 +2455,7 @@
                 return;
             }
             // Re-run the generation with the stored configuration
-            const { inputNumbers, gameConfig, advanceFilter, predictionAlgorithm, numPredictions } = appState.lastPredictionConfig;
-
-            const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
-            advancedPredictionLoading.classList.remove('hidden');
-            document.getElementById('advancedPredictionOutput').classList.remove('hidden');
-
-            const tickets = [];
-
-            const inputFrequencyMap = inputNumbers.reduce((acc, num) => {
-                acc[num] = (acc[num] || 0) + 1;
-                return acc;
-            }, {});
-
-            const sortedByFrequency = Object.entries(inputFrequencyMap).sort((a, b) => b[1] - a[1]);
-            const mostUsed = sortedByFrequency.map(item => parseInt(item[0]));
-            const leastUsed = sortedByFrequency.slice().reverse().map(item => parseInt(item[0]));
-            const { unusedNumbers } = detectUnusedFromInput(inputNumbers, gameConfig.mainPool);
-
-            try {
-                for (let i = 0; i < numPredictions; i++) {
-                    let mainNumbers = [];
-                    let bonusNumbers = Array.from({ length: gameConfig.bonusCount }, () => Math.floor(Math.random() * gameConfig.bonusPool) + 1);
-
-                    switch (advanceFilter) {
-                        case 'balanced':
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorUnused':
-                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorMostUsed':
-                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorLeastUsed':
-                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        default:
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                    }
-                    
-                    mainNumbers = [...new Set(mainNumbers)].slice(0, gameConfig.pickCount);
-                    while (mainNumbers.length < gameConfig.pickCount) {
-                        const randomNum = Math.floor(Math.random() * gameConfig.mainPool) + 1;
-                        if (!mainNumbers.includes(randomNum)) {
-                            mainNumbers.push(randomNum);
-                        }
-                    }
-
-                    mainNumbers = _.shuffle(mainNumbers);
-                    bonusNumbers = _.shuffle(bonusNumbers);
-                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter, algorithm: predictionAlgorithm });
-                }
-            } catch (error) {
-                console.error("Error regenerating advanced predictions:", error);
-                showNotification("Error regenerating predictions. Please try again.");
-            } finally {
-                advancedPredictionLoading.classList.add('hidden');
-            }
-
-            const outputDiv = document.getElementById('advancedPredictionOutput');
-            outputDiv.innerHTML = tickets.map((ticket, index) => `
-                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()}, Algo: ${ticket.algorithm.replace(/([A-Z])/g, ' $1').trim()})</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-1">
-                        ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                    </div>
-                    <div class="flex flex-wrap gap-1">
-                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
+            await generateAdvancedPrediction();
             showNotification('Regenerated advanced predictions!');
         }
 
@@ -2833,7 +2564,7 @@
                 showNotification("AI generation failed. Using fallback.");
             }
             
-            // Fallback to ensure correct count and uniqueness
+            // Fallback to ensure correct count
             while (generatedNumbers.length < pickCount) {
                 const randomNum = Math.floor(Math.random() * mainPool) + 1;
                 if (!generatedNumbers.includes(randomNum)) {
@@ -2864,13 +2595,10 @@
             }
 
             const game = document.getElementById('analyzerGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5
+            } : gameConfigs[game];
 
             const analysis = getNumberAnalysis(numbers, config.mainPool);
 
@@ -2916,8 +2644,8 @@
                 sum,
                 count,
                 avg,
-                min: numbers.length > 0 ? Math.min(...numbers) : 0,
-                max: numbers.length > 0 ? Math.max(...numbers) : 0,
+                min: Math.min(...numbers),
+                max: Math.max(...numbers),
                 oddCount,
                 evenCount,
                 oddPercent: count > 0 ? (oddCount / count) * 100 : 0,
@@ -3408,7 +3136,7 @@
             Provide a concise description of these optimal characteristics.`;
 
             try {
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
@@ -3542,7 +3270,7 @@
         function loadHistoricalData() {
             const source = document.getElementById('dataSource').value;
             const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
+            let config;
 
             if (game === 'custom') {
                 config = {
@@ -3561,26 +3289,13 @@
                     const date = new Date();
                     date.setDate(date.getDate() - (drawCount - i));
                     
-                    // Generate unique main numbers
-                    const numbers = new Set();
-                    while (numbers.size < config.pickCount) {
-                        numbers.add(Math.floor(Math.random() * config.mainPool) + 1);
-                    }
-
-                    // Generate unique bonus numbers
-                    const bonusNumbers = new Set();
-                    while (bonusNumbers.size < config.bonusCount) {
-                        bonusNumbers.add(Math.floor(Math.random() * config.bonusPool) + 1);
-                    }
-                    
                     return {
                         date: date.toISOString().split('T')[0],
-                        numbers: Array.from(numbers).sort((a, b) => a - b),
-                        bonus: Array.from(bonusNumbers).sort((a, b) => a - b)
+                        numbers: [...new Set(Array.from({ length: config.pickCount }, () => Math.floor(Math.random() * config.mainPool) + 1))].sort((a, b) => a - b),
+                        bonus: [...new Set(Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1))]
                     };
                 });
                 
-                appState.currentPage = 1; // Reset to first page after loading new data
                 displayHistoricalData();
                 updateHistoricalCharts();
                 showNotification(`Loaded ${drawCount} sample draws for ${game}`);
@@ -3608,7 +3323,7 @@
                         return {
                             date: date || new Date().toISOString().split('T')[0],
                             numbers: numbers.sort((a, b) => a - b),
-                            bonus: bonus.sort((a, b) => a - b)
+                            bonus: bonus
                         };
                     }).filter(draw => draw.numbers.length === config.pickCount && draw.bonus.length === config.bonusCount);
                     
@@ -3629,81 +3344,8 @@
                 };
                 
                 reader.readAsText(file);
-            } else if (source === 'manual') {
-                // Manual input is handled by addManualDraws, not loadData
-                // This branch is intentionally left empty as loadData is for loading from external sources/samples
-                showNotification('Please use "Add Draws" button for manual input.');
             }
         }
-
-        function addManualDraws() {
-            const manualInput = document.getElementById('manualDrawsInput').value;
-            const lines = manualInput.split('\n').filter(line => line.trim() !== '');
-            
-            if (lines.length === 0) {
-                showNotification('Please enter draws in the manual input field!');
-                return;
-            }
-
-            const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
-
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
-                };
-            } else {
-                config = gameConfigs[game];
-            }
-            
-            const newDraws = [];
-            let invalidDraws = 0;
-
-            lines.forEach(line => {
-                const parts = line.split(',');
-                // Check if there are enough parts for date + main numbers + bonus numbers
-                if (parts.length < config.pickCount + config.bonusCount + 1) { 
-                    invalidDraws++;
-                    return;
-                }
-
-                const date = parts[0].trim();
-                const numbers = parts.slice(1, 1 + config.pickCount).map(Number).filter(n => !isNaN(n));
-                const bonus = parts.slice(1 + config.pickCount, 1 + config.pickCount + config.bonusCount).map(Number).filter(n => !isNaN(n));
-
-                // Basic validation for numbers
-                const isValid = numbers.length === config.pickCount && 
-                                bonus.length === config.bonusCount &&
-                                numbers.every(n => n >= 1 && n <= config.mainPool) &&
-                                bonus.every(n => n >= 1 && n <= config.bonusPool);
-
-                if (isValid) {
-                    newDraws.push({
-                        date: date,
-                        numbers: numbers.sort((a, b) => a - b),
-                        bonus: bonus.sort((a, b) => a - b)
-                    });
-                } else {
-                    invalidDraws++;
-                }
-            });
-
-            if (newDraws.length > 0) {
-                appState.historicalData = [...appState.historicalData, ...newDraws];
-                appState.historicalData.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
-                appState.currentPage = 1; // Reset to first page after adding new data
-                displayHistoricalData();
-                updateHistoricalCharts();
-                showNotification(`Added ${newDraws.length} draws manually. ${invalidDraws > 0 ? `(${invalidDraws} invalid draws skipped)` : ''}`);
-                document.getElementById('manualDrawsInput').value = ''; // Clear input after adding
-            } else {
-                showNotification(`No valid draws added. Please check format. ${invalidDraws > 0 ? `(${invalidDraws} invalid draws)` : ''}`);
-            }
-        }
-
 
         function displayHistoricalData() {
             const tableBody = document.getElementById('historicalTable').querySelector('tbody');
@@ -3836,15 +3478,21 @@
         function getGapAnalysis() {
             const gaps = {};
             const game = document.getElementById('historicalGame').value;
-            let mainPool; // Declare mainPool with let
-
+            // Use the config from the currently selected game, including custom if active
+            let currentConfig;
             if (game === 'custom') {
-                mainPool = parseInt(document.getElementById('historicalMainPool').value) || 69;
+                currentConfig = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
             } else {
-                mainPool = gameConfigs[game].mainPool;
+                currentConfig = gameConfigs[game];
             }
+            const mainPool = currentConfig.mainPool;
             
-            for (let i = 1; i <= mainPool; i++) { gaps[i] = appState.historicalData.length; } // Initialize all gaps to total draws
+            for (let i = 1; i <= mainPool; i++) { gaps[i] = appState.historicalData.length; }
             
             const lastSeenIndex = {};
             appState.historicalData.forEach((draw, index) => {
@@ -3889,8 +3537,7 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
@@ -3922,8 +3569,7 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
@@ -3931,8 +3577,9 @@
                     bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
                     bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
                 };
+            } else {
+                config = gameConfigs[game];
             }
-            
             let recommendedNumbers = [];
             
             switch (strategy) {
@@ -3951,7 +3598,6 @@
                     break;
             }
             
-            // Ensure uniqueness and correct pickCount
             recommendedNumbers = [...new Set(recommendedNumbers)].slice(0, config.pickCount);
 
             document.getElementById('strategyResults').innerHTML = `<p class="font-medium">${strategy.charAt(0).toUpperCase() + strategy.slice(1)} Strategy Applied</p><p class="text-sm">Recommended numbers based on historical data analysis</p>`;
@@ -3981,8 +3627,7 @@
             };
             
             const game = document.getElementById('historicalGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
@@ -3990,6 +3635,8 @@
                     bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
                     bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
                 };
+            } else {
+                config = gameConfigs[game];
             }
             const mainPool = config.mainPool;
             
@@ -4047,20 +3694,15 @@
         function updateStrategyWeights() {
             const checkedComponents = Array.from(document.querySelectorAll('.strategyComponent:checked'));
             
-            // Reset all weights to 0 first
-            document.getElementById('freqWeight').value = 0;
-            document.getElementById('gapWeight').value = 0;
-            document.getElementById('patternWeight').value = 0;
-            document.getElementById('otherWeight').value = 0;
+            ['freqWeight', 'gapWeight', 'patternWeight', 'otherWeight'].forEach(id => document.getElementById(id).value = 0);
             
             if (checkedComponents.length > 0) {
                 const weightPerComponent = 100 / checkedComponents.length;
                 checkedComponents.forEach(comp => {
-                    let targetId = 'otherWeight'; // Default for prime/fibonacci/sum etc.
+                    let targetId = 'otherWeight';
                     if (comp.value === 'frequency') targetId = 'freqWeight';
                     else if (comp.value === 'gap') targetId = 'gapWeight';
                     else if (comp.value === 'pattern') targetId = 'patternWeight';
-                    // For 'sum', 'prime', 'fibonacci', they all fall under 'otherWeight' currently
                     
                     const el = document.getElementById(targetId);
                     el.value = parseFloat(el.value) + weightPerComponent;
@@ -4079,15 +3721,12 @@
         // Probability Functions
         function calculateProbabilities() {
             const game = document.getElementById('probabilityGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('probMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('probPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('probBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('probBonusCount').value) || 1
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('probMainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('probPickCount').value) || 5,
+                bonusPool: parseInt(document.getElementById('probBonusPool').value) || 26,
+                bonusCount: parseInt(document.getElementById('probBonusCount').value) || 1
+            } : gameConfigs[game];
             
             const tickets = parseInt(document.getElementById('ticketsToPlay').value) || 1;
             const jackpot = parseFloat(document.getElementById('jackpotSize').value) || 0;
@@ -4159,7 +3798,7 @@
             const jackpot = parseFloat(document.getElementById('jackpotSize').value) || 0;
             const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
             const afterTax = jackpot * (1 - taxRate / 100);
-            const breakEven = totalCombinations; // Simplified break-even as total combinations
+            const breakEven = totalCombinations;
             document.getElementById('investmentAnalysis').innerHTML = `<p>Break-even jackpot: $${breakEven.toLocaleString()}</p><p>After-tax value: $${afterTax.toLocaleString()}</p><p>Expected return: ${((afterTax / breakEven) * 100).toFixed(2)}%</p>`;
         }
 
@@ -4180,15 +3819,12 @@
 
         function exportProbabilityResults() {
             const game = document.getElementById('probabilityGame').value;
-            let config = gameConfigs[game]; // Declare config with let
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('probMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('probPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('probBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('probBonusCount').value) || 1
-                };
-            }
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('probMainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('probPickCount').value) || 5,
+                bonusPool: parseInt(document.getElementById('probBonusPool').value) || 26,
+                bonusCount: parseInt(document.getElementById('probBonusCount').value) || 1
+            } : gameConfigs[game];
             
             const tickets = parseInt(document.getElementById('ticketsToPlay').value) || 1;
             const jackpot = parseFloat(document.getElementById('jackpotSize').value) || 0;
@@ -4217,7 +3853,7 @@
             showNotification('Probability results exported as CSV!');
         }
 
-          // Prediction Functions
+        // Prediction Functions
         function generatePrediction() {
             if (appState.historicalData.length === 0) {
                 showNotification('Load historical data first to generate predictions!');
@@ -4225,8 +3861,7 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
@@ -4255,8 +3890,7 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
@@ -4334,8 +3968,7 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            let config; // Declare config with let
-
+            let config;
             if (game === 'custom') {
                 config = {
                     mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
