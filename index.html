@@ -691,9 +691,30 @@
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
                                 <option value="lotto649">Lotto 6/49</option>
                                 <option value="lotto645">Lotto 6/45</option>
+                                <option value="custom">Custom Game</option> <!-- Added Custom Game option here -->
                             </select>
                         </div>
                         
+                        <!-- Custom Game Configuration for Historical Data -->
+                        <div id="customHistoricalGameConfig" class="grid grid-cols-2 gap-2 hidden">
+                            <div>
+                                <label class="block text-sm font-medium">Main Pool</label>
+                                <input id="historicalMainPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 69">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Pick Count</label>
+                                <input id="historicalPickCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 5">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Bonus Pool</label>
+                                <input id="historicalBonusPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 26">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Bonus Count</label>
+                                <input id="historicalBonusCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium">Data Source</label>
                             <select id="dataSource" class="w-full p-2 border rounded-lg dark:bg-gray-700">
@@ -1301,6 +1322,8 @@
             initEventListeners();
             loadSettings();
             updateUI();
+            // Ensure custom historical game config is hidden/shown on initial load based on default game
+            handleHistoricalGameChange({ target: document.getElementById('historicalGame') });
         }
 
         // Initialize Charts
@@ -1369,6 +1392,7 @@
             document.getElementById('lotteryGame').addEventListener('change', handleGameChange);
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
             document.getElementById('analyzerGame').addEventListener('change', handleAnalyzerGameChange); // New event listener for analyzer game
+            document.getElementById('historicalGame').addEventListener('change', handleHistoricalGameChange); // Added event listener for historical game
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
             document.getElementById('reverseGame').addEventListener('change', () => { /* No specific action needed for game change yet */ });
             
@@ -1593,6 +1617,25 @@
                 document.getElementById('analyzerBonusCount').value = currentConfig.bonusCount;
             } else {
                 customConfig.classList.add('hidden');
+            }
+        }
+
+        // New function for handling historical game type change
+        function handleHistoricalGameChange(e) {
+            const game = e.target.value;
+            const customConfigDiv = document.getElementById('customHistoricalGameConfig');
+
+            if (game === 'custom') {
+                customConfigDiv.classList.remove('hidden');
+                // Populate with current game's values or defaults if switching to custom
+                // If the current value is 'custom' and we're just loading, use 'powerball' defaults
+                const currentConfig = gameConfigs[document.getElementById('historicalGame').value === 'custom' ? 'powerball' : document.getElementById('historicalGame').value];
+                document.getElementById('historicalMainPool').value = currentConfig.mainPool;
+                document.getElementById('historicalPickCount').value = currentConfig.pickCount;
+                document.getElementById('historicalBonusPool').value = currentConfig.bonusPool;
+                document.getElementById('historicalBonusCount').value = currentConfig.bonusCount;
+            } else {
+                customConfigDiv.classList.add('hidden');
             }
         }
 
@@ -2231,7 +2274,7 @@
                 csvContent += `Ticket ${index + 1},"${numbers.join(',')}","${bonus.join(',')}"\n`;
             });
             
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;');
             downloadBlob(blob, 'tickets.csv');
             showNotification('Tickets exported as CSV!');
         }
@@ -3311,7 +3354,18 @@
         function loadHistoricalData() {
             const source = document.getElementById('dataSource').value;
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             if (source === 'sample') {
                 const drawCount = parseInt(document.getElementById('pastDraws').value) || 50;
@@ -3391,7 +3445,18 @@
             }
 
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             const newDraws = [];
             let invalidDraws = 0;
@@ -3568,7 +3633,13 @@
         function getGapAnalysis() {
             const gaps = {};
             const game = document.getElementById('historicalGame').value;
-            const mainPool = gameConfigs[game].mainPool;
+            let mainPool;
+
+            if (game === 'custom') {
+                mainPool = parseInt(document.getElementById('historicalMainPool').value) || 69;
+            } else {
+                mainPool = gameConfigs[game].mainPool;
+            }
             
             for (let i = 1; i <= mainPool; i++) { gaps[i] = appState.historicalData.length; }
             
@@ -3615,7 +3686,18 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             const csvData = [
                 ['Date', ...Array.from({ length: config.pickCount }, (_, i) => `Number${i + 1}`), ...Array.from({ length: config.bonusCount }, (_, i) => `Bonus${i + 1}`)],
@@ -3637,7 +3719,19 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
+
             let recommendedNumbers = [];
             
             switch (strategy) {
@@ -3685,7 +3779,18 @@
             };
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             const mainPool = config.mainPool;
             
             const candidates = Array.from({ length: mainPool }, (_, i) => i + 1);
@@ -3909,7 +4014,18 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             const { numbers, bonus, confidence, scoredNumbers } = generatePredictionData(config);
             
@@ -3928,7 +4044,18 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             let forecast = '';
             for (let i = 1; i <= 40; i++) {
@@ -3996,7 +4123,18 @@
             }
             
             const game = document.getElementById('historicalGame').value;
-            const config = gameConfigs[game];
+            let config; // Declare config with let
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('historicalMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('historicalPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('historicalBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('historicalBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             let predictions = '';
             for (let i = 1; i <= numPredictions; i++) {
