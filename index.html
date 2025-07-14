@@ -700,6 +700,7 @@
                                 <option value="sample">Sample Data (Built-in)</option>
                                 <option value="api">Live API (Premium)</option>
                                 <option value="csv">Upload CSV</option>
+                                <option value="manual">Manual Input</option> <!-- New option for manual input -->
                             </select>
                         </div>
                         
@@ -707,6 +708,14 @@
                             <label class="block text-sm font-medium">Upload CSV File</label>
                             <input id="csvUpload" type="file" accept=".csv" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">CSV format: Date,Number1,Number2,...,Bonus1,Bonus2</p>
+                        </div>
+
+                        <!-- New Manual Input Container -->
+                        <div id="manualInputContainer" class="hidden">
+                            <label class="block text-sm font-medium">Input Draws Manually</label>
+                            <textarea id="manualDrawsInput" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter draws, one per line. Format: YYYY-MM-DD,N1,N2,N3,N4,N5,B1 (e.g., 2023-01-01,5,12,23,34,45,6)"></textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separate numbers with commas. Bonus numbers at the end.</p>
+                            <button id="addManualDraws" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 w-full mt-2">Add Draws</button>
                         </div>
                         
                         <div>
@@ -1408,6 +1417,7 @@
             document.getElementById('prevPage').addEventListener('click', prevPage);
             document.getElementById('nextPage').addEventListener('click', nextPage);
             document.getElementById('exportHistorical').addEventListener('click', exportHistoricalData);
+            document.getElementById('addManualDraws').addEventListener('click', addManualDraws); // New event listener for manual input
             
             // Strategy Controls
             document.querySelectorAll('.applyStrategy').forEach(btn => {
@@ -1589,11 +1599,17 @@
         function handleDataSourceChange(e) {
             const source = e.target.value;
             const csvUploadContainer = document.getElementById('csvUploadContainer');
+            const manualInputContainer = document.getElementById('manualInputContainer'); // Get manual input container
             
+            // Hide all containers first
+            csvUploadContainer.classList.add('hidden');
+            manualInputContainer.classList.add('hidden');
+
+            // Show relevant container based on selection
             if (source === 'csv') {
                 csvUploadContainer.classList.remove('hidden');
-            } else {
-                csvUploadContainer.classList.add('hidden');
+            } else if (source === 'manual') { // Show manual input if selected
+                manualInputContainer.classList.remove('hidden');
             }
         }
 
@@ -3358,8 +3374,68 @@
                 };
                 
                 reader.readAsText(file);
+            } else if (source === 'manual') {
+                // Manual input is handled by addManualDraws, not loadData
+                // This branch is intentionally left empty as loadData is for loading from external sources/samples
+                showNotification('Please use "Add Draws" button for manual input.');
             }
         }
+
+        function addManualDraws() {
+            const manualInput = document.getElementById('manualDrawsInput').value;
+            const lines = manualInput.split('\n').filter(line => line.trim() !== '');
+            
+            if (lines.length === 0) {
+                showNotification('Please enter draws in the manual input field!');
+                return;
+            }
+
+            const game = document.getElementById('historicalGame').value;
+            const config = gameConfigs[game];
+            
+            const newDraws = [];
+            let invalidDraws = 0;
+
+            lines.forEach(line => {
+                const parts = line.split(',');
+                if (parts.length < config.pickCount + config.bonusCount + 1) { // Date + Main + Bonus
+                    invalidDraws++;
+                    return;
+                }
+
+                const date = parts[0].trim();
+                const numbers = parts.slice(1, 1 + config.pickCount).map(Number).filter(n => !isNaN(n));
+                const bonus = parts.slice(1 + config.pickCount, 1 + config.pickCount + config.bonusCount).map(Number).filter(n => !isNaN(n));
+
+                // Basic validation for numbers
+                const isValid = numbers.length === config.pickCount && 
+                                bonus.length === config.bonusCount &&
+                                numbers.every(n => n >= 1 && n <= config.mainPool) &&
+                                bonus.every(n => n >= 1 && n <= config.bonusPool);
+
+                if (isValid) {
+                    newDraws.push({
+                        date: date,
+                        numbers: numbers.sort((a, b) => a - b),
+                        bonus: bonus.sort((a, b) => a - b)
+                    });
+                } else {
+                    invalidDraws++;
+                }
+            });
+
+            if (newDraws.length > 0) {
+                appState.historicalData = [...appState.historicalData, ...newDraws];
+                appState.historicalData.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+                displayHistoricalData();
+                updateHistoricalCharts();
+                showNotification(`Added ${newDraws.length} draws manually. ${invalidDraws > 0 ? `(${invalidDraws} invalid draws skipped)` : ''}`);
+                document.getElementById('manualDrawsInput').value = ''; // Clear input after adding
+            } else {
+                showNotification(`No valid draws added. Please check format. ${invalidDraws > 0 ? `(${invalidDraws} invalid draws)` : ''}`);
+            }
+        }
+
 
         function displayHistoricalData() {
             const tableBody = document.getElementById('historicalTable').querySelector('tbody');
